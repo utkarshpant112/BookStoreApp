@@ -69,3 +69,14 @@
   font-size: 13px;
   text-decoration: none;
 }
+
+.logo {
+  color: orangered;
+  font-weight: normal;
+  font-family: "Guardian-EgypTT", Charter, "Charter Bitstream", Cambria,
+    "Noto Serif Light", "Droid Serif", Georgia, serif;
+  font-size: xx-large;
+  margin-top: 0%;
+  font-stretch: expanded;
+  text-decoration: none;
+}

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
+import { Link, useLocation } from "react-router-dom";
 import "../../App.css";
 import axios from "axios";
 import cookie from "react-cookies";
-import { Redirect } from "react-router";
 
 //Define a Login Component
 class Login extends Component {
@@ -71,7 +71,7 @@ class Login extends Component {
     //redirect based on successful login
     let redirectVar = null;
     if (cookie.load("cookie")) {
-      redirectVar = <Redirect to="/home" />;
+      redirectVar = <Link to="/home" />;
     }
     return (
       <div>

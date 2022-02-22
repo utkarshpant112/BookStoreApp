@@ -1,10 +1,13 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
-import { Redirect } from "react-router";
+import Navbar from "react-bootstrap/Navbar";
+import Container from "react-bootstrap/Container";
+import { LinkContainer } from "react-router-bootstrap";
+import Nav from "react-bootstrap/Nav";
 
 //create the Navbar Component
-class Navbar extends Component {
+class EtsyHeader extends Component {
   constructor(props) {
     super(props);
     this.handleLogout = this.handleLogout.bind(this);
@@ -32,44 +35,36 @@ class Navbar extends Component {
       //Else display login button
       console.log("Not Able to read cookie");
       navLogin = (
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <Link to="/login">
-              <span class="glyphicon glyphicon-log-in"></span> Login
-            </Link>
-          </li>
-        </ul>
+        <Link to="/login" className="nav-link">
+          Login
+        </Link>
       );
     }
     let redirectVar = null;
     if (cookie.load("cookie")) {
-      redirectVar = <Redirect to="/home" />;
+      redirectVar = <Link to="/home" />;
     }
     return (
       <div>
         {redirectVar}
-        <nav class="navbar navbar-inverse">
-          <div class="container-fluid">
-            <div class="navbar-header">
-              <a class="navbar-brand">Etsy</a>
-            </div>
-            <ul class="nav navbar-nav">
-              <li class="active">
-                <Link to="/home">Home</Link>
-              </li>
-              <li>
-                <Link to="/create">Add a Book</Link>
-              </li>
-              <li>
-                <Link to="/delete">Delete a Book</Link>
-              </li>
-            </ul>
-            {navLogin}
-          </div>
-        </nav>
+        <header>
+          <Navbar bg="white" variant="white">
+            <Container>
+              <LinkContainer to="/">
+                <Navbar.Brand className="logo">Etsy</Navbar.Brand>
+              </LinkContainer>
+              <Nav className="me-auto">
+                <Link to="/signin" className="nav-link">
+                  Profile
+                </Link>
+                {navLogin}
+              </Nav>
+            </Container>
+          </Navbar>
+        </header>
       </div>
     );
   }
 }
 
-export default Navbar;
+export default EtsyHeader;
