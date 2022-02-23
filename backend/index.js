@@ -80,6 +80,32 @@ app.post("/login", function (req, res) {
   });
 });
 
+app.get("/api/products", (req, res) => {
+  res.send(data.products);
+});
+
+app.get("/api/products/id/:id", (req, res) => {
+  const id = req.params.id;
+  const product = data.products.find((x) => x.id === parseInt(id));
+
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: "Product Not Found" });
+  }
+});
+
+app.get("/api/products/:id", (req, res) => {
+  const id = req.params.id;
+  const product = data.products.find((x) => x.id === parseInt(id));
+
+  if (product) {
+    res.send(product);
+  } else {
+    res.status(404).send({ message: "Product Not Found" });
+  }
+});
+
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");

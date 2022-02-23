@@ -5,6 +5,7 @@ import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { LinkContainer } from "react-router-bootstrap";
 import Nav from "react-bootstrap/Nav";
+import "./EtsyHeader.css";
 
 //create the Navbar Component
 class EtsyHeader extends Component {
@@ -45,7 +46,7 @@ class EtsyHeader extends Component {
       redirectVar = <Link to="/home" />;
     }
     return (
-      <div>
+      <div className="d-flex flex-column site-container">
         {redirectVar}
         <header>
           <Navbar bg="white" variant="white">
@@ -57,8 +58,8 @@ class EtsyHeader extends Component {
                 <Link to="/signin" className="nav-link">
                   Profile
                 </Link>
-                {navLogin}
               </Nav>
+              <Nav>{navLogin}</Nav>
             </Container>
           </Navbar>
         </header>
