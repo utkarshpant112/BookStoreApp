@@ -1,6 +1,6 @@
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Rating from "./Rating";
 import axios from "axios";
 import { useContext } from "react";
@@ -23,6 +23,7 @@ function Product(props) {
         cartItems[cartItems.length] = {
           id: product.id,
           quantity: 1,
+          ...product,
         };
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
         return;
@@ -33,6 +34,7 @@ function Product(props) {
       cartItems[index] = {
         id: product.id,
         quantity: quantity,
+        ...product,
       };
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
     } else {
@@ -40,6 +42,7 @@ function Product(props) {
         {
           id: product.id,
           quantity: 1,
+          ...product,
         },
       ];
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
