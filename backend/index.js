@@ -49,6 +49,57 @@ var Users = [
   },
 ];
 
+const products = [
+  {
+    name: "Boho wall decor",
+    id: 1,
+    category: "Decor",
+    image: "/images/p1.jpg",
+    price: 120,
+    countInStock: 0,
+    brand: "rldh",
+    rating: 4.5,
+    numReviews: 10,
+    description: "Good home decor",
+  },
+  {
+    name: "Social Worker Shirt",
+    id: 2,
+    category: "Shirts",
+    image: "/images/p2.jpg",
+    price: 100,
+    countInStock: 12,
+    brand: "rldh",
+    rating: 4.5,
+    numReviews: 8,
+    description: "Good home shirt",
+  },
+  {
+    name: "The Boston Cardigan",
+    id: 3,
+    category: "Cardigan",
+    image: "/images/p3.jpg",
+    price: 120,
+    countInStock: 10,
+    brand: "rldh",
+    rating: 4.5,
+    numReviews: 10,
+    description: "Good home decor",
+  },
+  {
+    name: "Boho wall decor 2",
+    id: 4,
+    category: "Decor",
+    image: "/images/p4.jpg",
+    price: 120,
+    countInStock: 10,
+    brand: "rldh",
+    rating: 4.5,
+    numReviews: 10,
+    description: "Good home decor",
+  },
+];
+
 //Route to handle Post Request Call
 app.post("/login", function (req, res) {
   // Object.keys(req.body).forEach(function(key){
@@ -80,30 +131,36 @@ app.post("/login", function (req, res) {
   });
 });
 
-app.get("/api/products", (req, res) => {
-  res.send(data.products);
+//Route to get All Books when user visits the Home Page
+app.get("/home", function (req, res) {
+  console.log("Inside Home Login");
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+  });
+  console.log("Books : ", JSON.stringify(books));
+  res.end(JSON.stringify(books));
 });
 
-app.get("/api/products/id/:id", (req, res) => {
-  const id = req.params.id;
-  const product = data.products.find((x) => x.id === parseInt(id));
-
-  if (product) {
-    res.send(product);
-  } else {
-    res.status(404).send({ message: "Product Not Found" });
-  }
+//Route to get All Books when user visits the Home Page
+app.get("/api/products", function (req, res) {
+  console.log("Inside Products");
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+  });
+  console.log("products : ", JSON.stringify(products));
+  res.end(JSON.stringify(products));
 });
 
-app.get("/api/products/:id", (req, res) => {
+app.get("/api/products/id/:id", function (req, res) {
+  console.log("Inside Products");
   const id = req.params.id;
-  const product = data.products.find((x) => x.id === parseInt(id));
+  const product = products.find((x) => x.id === parseInt(id));
 
-  if (product) {
-    res.send(product);
-  } else {
-    res.status(404).send({ message: "Product Not Found" });
-  }
+  res.writeHead(200, {
+    "Content-Type": "application/json",
+  });
+  console.log("product : ", JSON.stringify(product));
+  res.end(JSON.stringify(product));
 });
 
 //start your server on port 3001

@@ -27,12 +27,13 @@ class CartPage extends Component {
     };
   }
   componentDidMount() {
-    const abc = JSON.parse(localStorage.getItem("cartItems"));
-    console.log(abc);
-    this.setState({
-      cartItems: this.state.cartItems.concat(abc),
-    });
-    console.log(this.state.cartItems);
+    if (localStorage.getItem("cartItems") != null) {
+      this.setState({
+        cartItems: this.state.cartItems.concat(
+          JSON.parse(localStorage.getItem("cartItems"))
+        ),
+      });
+    }
   }
 
   render() {
