@@ -1,7 +1,6 @@
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import { Link, useNavigate } from "react-router-dom";
-import Rating from "./Rating";
 import axios from "axios";
 import { useContext } from "react";
 import { Store } from "../Store";
@@ -50,7 +49,7 @@ function Product(props) {
   };
 
   return (
-    <Card>
+    <Card className="product-card">
       <Link to={`/product/${product.id}`}>
         <img src={product.image} className="card-img-top" alt={product.name} />
       </Link>
@@ -58,14 +57,11 @@ function Product(props) {
         <Link to={`/product/${product.id}`}>
           <Card.Title>{product.name}</Card.Title>
         </Link>
-        <Rating rating={product.rating} numReviews={product.numReviews} />
-        <Card.Text>${product.price}</Card.Text>
-        {product.countInStock === 0 ? (
-          <Button variant="light" disabled>
-            Out of stock
-          </Button>
+        <Card.Text>$ {product.price}</Card.Text>
+        {product.instock === 0 ? (
+          <Card.Text>Out of stock</Card.Text>
         ) : (
-          <Button onClick={() => addToCartHandler(product)}>Add to cart</Button>
+          <Card.Text>Available</Card.Text>
         )}
       </Card.Body>
     </Card>

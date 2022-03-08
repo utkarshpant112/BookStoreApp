@@ -3,79 +3,115 @@ import Container from "react-bootstrap/Container";
 import { LinkContainer } from "react-router-bootstrap";
 import Badge from "react-bootstrap/Badge";
 import Nav from "react-bootstrap/Nav";
-import { Component, useContext } from "react";
+import { Component, useContext, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
-import cookie from "react-cookies";
-import { Navigate } from "react-router";
 
-class EtsyNavbar extends Component {
-  constructor(props) {
-    super(props);
-    this.handleLogout = this.handleLogout.bind(this);
-  }
+import cookie from "react-cookies";
+import { Navigate, withRouter } from "react-router";
+import SearchBox from "./Searchbox";
+import LoginModal from "./LoginModal";
+import Button from "react-bootstrap/Button";
+import { useDispatch, useSelector } from "react-redux";
+import { logout, signin, signout } from "../actions/userActions";
+import { connect } from "react-redux";
+
+function EtsyNavbar(props) {
+  const [isLoggedIn, setisLoggedIn] = useState("");
+  const dispatch = useDispatch();
 
   //handle logout to destroy the cookie
-  handleLogout = () => {
+  const handleLogout = (e) => {
+    console.log("Inside logout");
+    dispatch(logout());
     cookie.remove("cookie", { path: "/" });
-    window.location.reload();
-    window.open("/login", "_self");
   };
 
-  render() {
-    //if Cookie is set render Logout Button
-    let navLogin = null;
-    if (cookie.load("cookie")) {
-      console.log("Able to read cookie");
-      navLogin = (
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <Link to="/" onClick={this.handleLogout}>
-              <span class="glyphicon glyphicon-user"></span>Logout
-            </Link>
-          </li>
-        </ul>
-      );
-    } else {
-      //Else display login button
-      console.log("Not Able to read cookie");
-      navLogin = (
-        <ul class="nav navbar-nav navbar-right">
-          <li>
-            <Link to="/login">
-              <span class="glyphicon glyphicon-log-in"></span> Login
-            </Link>
-          </li>
-        </ul>
-      );
-    }
-    let redirectVar = null;
-    if (cookie.load("cookie")) {
-      redirectVar = <Navigate to="/" />;
-    }
-    return (
-      <div>
-        {redirectVar}
-        <Navbar bg="white" variant="white">
-          <Container>
-            <LinkContainer to="/">
-              <Navbar.Brand className="logo">Etsy</Navbar.Brand>
-            </LinkContainer>
-            <Nav className="me-auto">
+  return (
+    <div className="EtsyNavbar">
+      <Navbar bg="white" variant="white">
+        <Container>
+          <LinkContainer to="/">
+            <Navbar.Brand className="logo">Etsy</Navbar.Brand>
+          </LinkContainer>
+          <SearchBox></SearchBox>
+          <Nav className="me-auto">
+            {!cookie.load("cookie") ? (
+              <LoginModal
+                buttonName={"Favourites"}
+                redirectTo={"/favorites"}
+              ></LoginModal>
+            ) : (
+              <Link to="/favorites" className="nav-link">
+                Favourites
+              </Link>
+            )}
+          </Nav>
+          <Nav className="me-auto">
+            {!cookie.load("cookie") ? (
+              <LoginModal
+                buttonName={"Sell"}
+                redirectTo={"/createshop"}
+              ></LoginModal>
+            ) : (
+              <Link to="/createshop" className="nav-link">
+                Sell
+              </Link>
+            )}
+          </Nav>
+          <Nav className="me-auto">
+            {!cookie.load("cookie") ? (
+              <LoginModal
+                buttonName={"My Purchases"}
+                redirectTo={"/mypurchases"}
+              ></LoginModal>
+            ) : (
+              <Link to="/mypurchases" className="nav-link">
+                My Purchases
+              </Link>
+            )}
+          </Nav>
+          <Nav className="me-auto">
+            {!cookie.load("cookie") ? (
+              <LoginModal
+                buttonName={"Profile"}
+                redirectTo={"/profile"}
+              ></LoginModal>
+            ) : (
               <Link to="/profile" className="nav-link">
                 Profile
               </Link>
-            </Nav>
-            <Nav className="me-auto">
-              <Link to="/cart" className="nav-link">
-                Cart
-              </Link>
-            </Nav>
-            {navLogin}
-          </Container>
-        </Navbar>
-      </div>
-    );
-  }
+            )}
+          </Nav>
+          <Nav className="me-auto">
+            <Link to="/cart" className="nav-link">
+              Cart
+            </Link>
+          </Nav>
+          {props.user ? (
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <Link to="/" onClick={handleLogout} className="nav-link">
+                  Logout
+                </Link>
+              </li>
+            </ul>
+          ) : (
+            <ul class="nav navbar-nav navbar-right">
+              <li>
+                <LoginModal buttonName={"Login"} redirectTo={"/"}></LoginModal>
+              </li>
+            </ul>
+          )}
+        </Container>
+      </Navbar>
+    </div>
+  );
 }
 
-export default EtsyNavbar;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userSignin.userInfo,
+  };
+};
+
+export default connect(mapStateToProps)(EtsyNavbar);

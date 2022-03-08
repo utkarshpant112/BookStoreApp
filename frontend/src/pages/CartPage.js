@@ -6,20 +6,13 @@ import Col from "react-bootstrap/Col";
 import MessageBox from "../components/MessageBox";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
+import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
 import { Link, useNavigate } from "react-router-dom";
+import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
+import axios from "axios";
 
 class CartPage extends Component {
-  // const removeItemHandler = (item) => {
-  //   ctxDispatch({ type: "CART_REMOVE_ITEM", payload: item });
-  // };
-
-  // checkoutHandler = () => {
-  //   this.setState({
-  //     cartItems: JSON.parse(localStorage.getItem("cartItems")),
-  //   });
-  // };
-
   constructor() {
     super();
     this.state = {
@@ -36,8 +29,52 @@ class CartPage extends Component {
     }
   }
 
+  checkoutHandler = (e) => {
+    var headers = new Headers();
+    //prevent page from refresh
+    e.preventDefault();
+    this.state.cartItems.map((item) => {
+      const data = {
+        name: item.name,
+        price: item.price * item.quantity,
+        image: item.image,
+        shopname: item.shopname,
+        quantity: item.quantity,
+        date: new Date().toLocaleDateString(),
+        email: localStorage.getItem("email"),
+      };
+
+      axios.defaults.withCredentials = true;
+      //make a post request with the user data
+      axios.post("http://localhost:3001/createorder", data).then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200 && response.data === "order Created") {
+          this.setState({
+            authFlag: true,
+            message: "Order Created",
+          });
+          localStorage.removeItem("cartItems");
+        } else {
+          this.setState({
+            authFlag: false,
+            message: response.data,
+          });
+          localStorage.removeItem("cartItems");
+        }
+      });
+    });
+
+    let url = "/mypurchases";
+    window.location.href = url;
+  };
+
   render() {
-    return (
+    return this.state.cartItems.length === 0 ? (
+      <Alert variant="success">
+        <Alert.Heading>Cart is empty.</Alert.Heading>
+        <Link to="/">Go Shopping</Link>
+      </Alert>
+    ) : (
       <div>
         <Helmet>
           <title>Shopping Cart</title>
@@ -45,40 +82,45 @@ class CartPage extends Component {
         <h1>Shopping Cart</h1>
         <Row>
           <Col md={8}>
-            {this.state.cartItems.length === 0 ? (
-              <MessageBox>
-                Cart is empty. <Link to="/">Go Shopping</Link>
-              </MessageBox>
-            ) : (
-              <ListGroup>
-                {this.state.cartItems.map((item) => (
-                  <ListGroup.Item key={item.id}>
-                    <Row className="align-items-center">
-                      <Col md={4}>
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="img-fluid rounded img-thumbnail"
-                        ></img>{" "}
-                        <Link to={`/product/${item.id}`}>{item.name}</Link>
-                      </Col>
-                      <Col md={3}>
-                        <span>{item.quantity}</span>{" "}
-                      </Col>
-                      <Col md={3}>${item.price}</Col>
-                      <Col md={2}>
-                        <Button
-                          onClick={() => this.removeItemHandler(item)}
-                          variant="light"
-                        >
-                          <i className="fas fa-trash"></i>
-                        </Button>
-                      </Col>
-                    </Row>
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            )}
+            <ListGroup>
+              <ListGroupItem>
+                <Row>
+                  <Col md={6}>
+                    <h5>Item</h5>
+                  </Col>
+                  <Col md={2}>
+                    <h5>Quantity</h5>
+                  </Col>
+                  <Col md={2}>
+                    <h5>Price</h5>
+                  </Col>
+                  <Col md={2}>
+                    <h5>Total Price</h5>
+                  </Col>
+                </Row>
+              </ListGroupItem>
+
+              {this.state.cartItems.map((item) => (
+                <ListGroup.Item key={item.id}>
+                  <Row className="align-items-center">
+                    <Col md={6}>
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="img-fluid rounded img-thumbnail"
+                        style={{ width: "70px", height: "70px" }}
+                      ></img>{" "}
+                      <Link to={`/product/${item.id}`}>{item.name}</Link>
+                    </Col>
+                    <Col md={2}>
+                      <span>{item.quantity}</span>{" "}
+                    </Col>
+                    <Col md={2}>${item.price}</Col>
+                    <Col md={2}>${item.price * item.quantity}</Col>
+                  </Row>
+                </ListGroup.Item>
+              ))}
+            </ListGroup>
           </Col>
           <Col md={4}>
             <Card>
@@ -103,7 +145,7 @@ class CartPage extends Component {
                         onClick={this.checkoutHandler}
                         disabled={this.state.cartItems.length === 0}
                       >
-                        Proceed to Checkout
+                        Buy Now
                       </Button>
                     </div>
                   </ListGroup.Item>
