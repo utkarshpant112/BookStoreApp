@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 import { HelmetProvider } from "react-helmet-async";
-import { StoreProvider } from "./Store";
+import Store from "./Store";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import App from "./App";
@@ -9,11 +10,11 @@ import registerServiceWorker from "./registerServiceWorker";
 
 ReactDOM.render(
   <React.StrictMode>
-    <StoreProvider>
+    <Provider store={Store}>
       <HelmetProvider>
         <App />
       </HelmetProvider>
-    </StoreProvider>
+    </Provider>
   </React.StrictMode>,
   document.getElementById("root")
 );
