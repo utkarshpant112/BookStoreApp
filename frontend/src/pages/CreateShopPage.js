@@ -1,0 +1,178 @@
+import React, { Component } from "react";
+import axios from "axios";
+import cookie from "react-cookies";
+import { Navigate } from "react-router";
+import Select from "react-select";
+import Button from "react-bootstrap/Button";
+
+//Define a Login Component
+class CreateShopPage extends Component {
+  //call the constructor method
+  constructor(props) {
+    //Call the constrictor of Super class i.e The Component
+    super(props);
+    //maintain the state required for this component
+
+    this.state = {
+      shopname: "",
+      shopcreated: undefined,
+      message: undefined,
+    };
+    //Bind the handlers to this class
+    this.shopnameChangeHandler = this.shopnameChangeHandler.bind(this);
+    this.shopnameAvailable = this.shopnameAvailable.bind(this);
+    this.createShop = this.createShop.bind(this);
+    // this.submitShopName = this.submitShopName.bind(this);
+  }
+
+  //shop name change handler to update state variable with the text entered by the user
+  shopnameChangeHandler = (e) => {
+    this.setState({
+      shopname: e.target.value,
+    });
+  };
+
+  componentWillMount() {
+    const data = {
+      email: localStorage.getItem("email"),
+    };
+    if (localStorage.getItem("email") != null) {
+      axios
+        .post("http://localhost:3001/isshopalreadycreated", data)
+        .then((response) => {
+          console.log("Status Code : ", response.status);
+          if (
+            response.status === 200 &&
+            response.data === "Shop already created"
+          ) {
+            this.setState({
+              shopcreated: true,
+              shopname: "Test Shop",
+            });
+          }
+        });
+    }
+  }
+
+  shopnameAvailable = (e) => {
+    //prevent page from refresh
+    e.preventDefault();
+    const data = {
+      shopname: this.state.shopname,
+    };
+
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+    //make a post request with the user dat a
+    axios
+      .post("http://localhost:3001/shopNameAvailable", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        if (
+          response.status === 200 &&
+          response.data === "Shop name is available."
+        ) {
+          this.setState({
+            message: response.data,
+          });
+        } else {
+          this.setState({
+            message: response.data,
+          });
+        }
+      });
+  };
+
+  //submit Shop Name to send a request to the node backend
+  createShop = (e) => {
+    //prevent page from refresh
+    e.preventDefault();
+    const data = {
+      shopname: this.state.shopname,
+      email: localStorage.getItem("email"),
+    };
+    //set the with credentials to true
+    axios.defaults.withCredentials = true;
+
+    axios.post("http://localhost:3001/createshop", data).then((response) => {
+      console.log("Status Code : ", response.status);
+      if (response.status === 200 && response.data === "Shop Created") {
+        this.setState({
+          message: response.data,
+          shopcreated: true,
+        });
+      } else {
+        this.setState({
+          message: response.data,
+        });
+      }
+    });
+  };
+
+  render() {
+    //redirect based on successful login
+    let redirectVar = null;
+    if (!cookie.load("cookie")) {
+      redirectVar = <Navigate to="/login" />;
+    }
+    if (this.state.shopcreated) {
+      redirectVar = <Navigate to={"/shoppage/" + this.state.shopname} />;
+    }
+    return (
+      <div>
+        {redirectVar}
+        <div class="container">
+          <div class="profile-form">
+            <div class="main-div">
+              <div class="panel">
+                <h2>Name Your shop</h2>
+                <p>Choose a memorable name that suits your style</p>
+                <div class="form-inline my-2 my-lg-0">
+                  <div class="input-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      onChange={this.shopnameChangeHandler}
+                      placeholder="Shop Name"
+                    />
+                    <Button
+                      type="button"
+                      variant="primary"
+                      onClick={this.shopnameAvailable}
+                    >
+                      Check Availability
+                    </Button>
+                  </div>
+                </div>
+                <div class={this.state.message ? "visible" : "invisible"}>
+                  <div class="alert alert-primary">{this.state.message}</div>
+                </div>
+                <div
+                  class={
+                    this.state.message === "Shop name is available."
+                      ? "visible"
+                      : "invisible"
+                  }
+                >
+                  <Button
+                    type="button"
+                    variant="primary"
+                    onClick={this.createShop}
+                  >
+                    Create Shop
+                  </Button>
+                </div>
+                <p>
+                  Your shop name will appear in your shop and next to each of
+                  your listing throughout Etsy.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+//export Login Component
+export default CreateShopPage;
