@@ -52,16 +52,35 @@ function Product(props) {
     <Card className="product-card">
       <Link to={`/product/${product.id}`}>
         <img src={product.image} className="card-img-top" alt={product.name} />
+
+        <img
+          src="/images/heart.png"
+          classname="favorite-button-image"
+          alt="my image"
+          style={{
+            position: "absolute",
+            top: "5px",
+            right: "5px",
+            height: "20px",
+            width: "20px",
+          }}
+        />
       </Link>
       <Card.Body>
-        <Link to={`/product/${product.id}`}>
+        <Link
+          style={{ textDecoration: "none", color: "black" }}
+          to={`/product/${product.id}`}
+        >
           <Card.Title>{product.name}</Card.Title>
         </Link>
+
         <Card.Text>$ {product.price}</Card.Text>
         {product.instock === 0 ? (
-          <Card.Text>Out of stock</Card.Text>
+          <Card.Text>Out of stock ({product.totalsales} sold)</Card.Text>
         ) : (
-          <Card.Text>Available</Card.Text>
+          <Card.Text>
+            Available: {product.instock} ({product.totalsales} sold){" "}
+          </Card.Text>
         )}
       </Card.Body>
     </Card>

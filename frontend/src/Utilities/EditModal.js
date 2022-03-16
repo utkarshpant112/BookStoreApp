@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from "react";
-import ReactDom from "react-dom";
 import axios from "axios";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { storage_bucket } from "./firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useParams } from "react-router";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Select from "react-select";
 
 export default function EditModal(props) {
   const { shopname } = props;
-  const { refresh } = props;
-  const { refreshPage } = props;
-  const [isOpen, setIsOpen] = useState(false);
-
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [name, setName] = useState("");
@@ -25,9 +18,9 @@ export default function EditModal(props) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [countInStock, setCountInStock] = useState("");
-  const [product, setProduct] = useState("");
   const [message, setMessage] = useState("");
-  const [option, setOptions] = useState(
+  const [option, setOptions] = useState("");
+  const [categoryoptions, setcategoryOptions] = useState(
     props.products.map((product) => product.name)
   );
   const [mounted, setMounted] = useState(false);
@@ -42,15 +35,15 @@ export default function EditModal(props) {
       setOptions(abc);
       setMounted(true);
     });
+    axios.get("http://localhost:3001/categories").then((response) => {
+      //update the state with the response data
+      setcategoryOptions(response.data);
+    });
   }, []);
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
-    console.log(e);
-    console.log(e.label);
     setName(e.label);
-
-    console.log(name);
     axios
       .get("http://localhost:3001/productdetails/" + e.label)
       .then((response) => {
@@ -63,12 +56,10 @@ export default function EditModal(props) {
       });
   };
 
-  //name change handler to update state variable with the text entered by the user
+  //name image handler to update state variable with the image entered by the user
   const imageChangeHandler = (e) => {
     if (e.target.files && e.target.files[0]) {
       if (e.target.files[0] == null) return;
-      console.log(e.target.files[0]);
-      const storage = getStorage();
       const storageRef = ref(storage_bucket, e.target.files[0].name);
       // 'file' comes from the Blob or File API
       uploadBytes(storageRef, e.target.files[0])
@@ -81,27 +72,24 @@ export default function EditModal(props) {
         });
     }
   };
-  //name change handler to update state variable with the text entered by the user
+  //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
-    setCategory(e.target.value);
-    console.log(name);
+    setCategory(e.label);
   };
-  //name change handler to update state variable with the text entered by the user
+  //price change handler to update state variable with the text entered by the user
   const priceChangeHandler = (e) => {
     setPrice(e.target.value);
   };
-  //name change handler to update state variable with the text entered by the user
+  //description change handler to update state variable with the text entered by the user
   const descriptionChangeHandler = (e) => {
     setDescription(e.target.value);
   };
-
-  //name change handler to update state variable with the text entered by the user
+  //countinstock change handler to update state variable with the text entered by the user
   const countInStockChangeHandler = (e) => {
     setCountInStock(e.target.value);
   };
 
   const updateProduct = (e) => {
-    var headers = new Headers();
     //prevent page from refresh
     e.preventDefault();
     const data = {
@@ -142,7 +130,7 @@ export default function EditModal(props) {
           <Modal.Title>Edit Product</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={{ width: "54%", height: "35%" }}>
+          <div style={{ width: "59%", height: "35%" }}>
             <Card>
               <img
                 src={
@@ -190,14 +178,12 @@ export default function EditModal(props) {
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>
-            <input
-              onChange={categoryChangeHandler}
-              type="text"
-              class="form-control"
-              name="category"
+            <Select
               value={category}
-              placeholder="Category of product"
-            />
+              options={categoryoptions}
+              placeholder={category}
+              onChange={categoryChangeHandler}
+            ></Select>
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>
@@ -219,11 +205,10 @@ export default function EditModal(props) {
           <Button variant="primary" onClick={updateProduct}>
             Update Product
           </Button>
-          <br></br>
-          <div class={message ? "visible" : "invisible"}>
-            <div class="alert alert-primary">{message}</div>
-          </div>
         </Modal.Footer>
+        <div class={message ? "visible" : "invisible"}>
+          <div class="alert alert-primary">{message}</div>
+        </div>
       </Modal>
     </>
   );

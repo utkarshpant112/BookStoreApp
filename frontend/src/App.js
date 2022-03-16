@@ -8,7 +8,6 @@ import Badge from "react-bootstrap/Badge";
 import Nav from "react-bootstrap/Nav";
 import { useContext } from "react";
 import CartPage from "./pages/CartPage";
-import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import EtsyNavbar from "./components/EtsyNavbar";
 import ProfilePage from "./pages/ProfilePage";

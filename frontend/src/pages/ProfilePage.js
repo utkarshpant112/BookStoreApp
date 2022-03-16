@@ -2,21 +2,18 @@ import React, { Component } from "react";
 import axios from "axios";
 import cookie from "react-cookies";
 import { Navigate } from "react-router";
-import CountrySelector from "../Utilities/CountrySelector";
-import { useState, useMemo } from "react";
 import Select from "react-select";
 import Card from "react-bootstrap/Card";
 import countryList from "react-select-country-list";
 import { storage_bucket } from "../Utilities/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-//Define a Login Component
+//Define a Profile Page Component
 class ProfilePage extends Component {
   //call the constructor method
   constructor(props) {
     //Call the constrictor of Super class i.e The Component
     super(props);
-    //maintain the state required for this component
 
     this.state = {
       name: "",
@@ -28,7 +25,6 @@ class ProfilePage extends Component {
       country: "",
       about: "",
       image: "",
-      authFlag: false,
       message: undefined,
       options: countryList().getData(),
     };
@@ -45,16 +41,9 @@ class ProfilePage extends Component {
     this.onImageChange = this.onImageChange.bind(this);
     this.submitProfile = this.submitProfile.bind(this);
   }
-  //Call the Will Mount to set the auth Flag to false
-  componentWillMount() {
-    this.setState({
-      authFlag: false,
-    });
-  }
 
   componentDidMount() {
     let useremail = localStorage.getItem("email");
-    console.log(this.state.options);
     axios
       .get("http://localhost:3001/userprofile/" + useremail)
       .then((response) => {
@@ -121,14 +110,11 @@ class ProfilePage extends Component {
       about: e.target.value,
     });
   };
-
+  //image change handler to update state variable with the text entered by the user
   onImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       if (event.target.files[0] == null) return;
-      console.log(event.target.files[0]);
-      const storage = getStorage();
       const storageRef = ref(storage_bucket, event.target.files[0].name);
-      // 'file' comes from the Blob or File API
       uploadBytes(storageRef, event.target.files[0])
         .then((snapshot) => {
           return getDownloadURL(snapshot.ref);
@@ -144,7 +130,6 @@ class ProfilePage extends Component {
 
   //submit Login handler to send a request to the node backend
   submitProfile = (e) => {
-    var headers = new Headers();
     //prevent page from refresh
     e.preventDefault();
     const data = {
@@ -162,21 +147,23 @@ class ProfilePage extends Component {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://localhost:3001/updateprofile", data).then((response) => {
-      console.log("Status Code : ", response.status);
-      if (response.status === 200 && response.data === "Profile Update") {
-        localStorage.setItem("email", this.state.email);
+    axios
+      .post("http://localhost:3001/updateprofile", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200) {
+          localStorage.setItem("email", this.state.email);
+          this.setState({
+            message: response.data,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error.response.data);
         this.setState({
-          authFlag: true,
-          message: "Profile has been updated",
+          message: error.response.data,
         });
-      } else {
-        this.setState({
-          authFlag: false,
-          message: response.data,
-        });
-      }
-    });
+      });
   };
 
   render() {
@@ -195,7 +182,7 @@ class ProfilePage extends Component {
                 <h2>Your Public Profile</h2>
                 <p>Everything on this page can be seen by anyone</p>
               </div>
-              <div style={{ width: "23%" }}>
+              <div style={{ width: "25.45%" }}>
                 <Card>
                   <img
                     src={
@@ -301,9 +288,12 @@ class ProfilePage extends Component {
                 />
               </div>
               <br></br>
-              <button onClick={this.submitProfile} class="btn btn-primary">
-                Update Profile
-              </button>
+              <div>
+                <button onClick={this.submitProfile} class="btn btn-primary">
+                  Update Profile
+                </button>
+              </div>
+              <br></br>
               <div class={this.state.message ? "visible" : "invisible"}>
                 <div class="alert alert-primary">{this.state.message}</div>
               </div>
@@ -314,5 +304,6 @@ class ProfilePage extends Component {
     );
   }
 }
-//export Login Component
+
+//export ProfilePage Component
 export default ProfilePage;

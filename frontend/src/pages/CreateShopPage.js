@@ -2,16 +2,14 @@ import React, { Component } from "react";
 import axios from "axios";
 import cookie from "react-cookies";
 import { Navigate } from "react-router";
-import Select from "react-select";
 import Button from "react-bootstrap/Button";
 
-//Define a Login Component
+//Define a Create Shop Component
 class CreateShopPage extends Component {
   //call the constructor method
   constructor(props) {
     //Call the constrictor of Super class i.e The Component
     super(props);
-    //maintain the state required for this component
 
     this.state = {
       shopname: "",
@@ -22,13 +20,13 @@ class CreateShopPage extends Component {
     this.shopnameChangeHandler = this.shopnameChangeHandler.bind(this);
     this.shopnameAvailable = this.shopnameAvailable.bind(this);
     this.createShop = this.createShop.bind(this);
-    // this.submitShopName = this.submitShopName.bind(this);
   }
 
   //shop name change handler to update state variable with the text entered by the user
   shopnameChangeHandler = (e) => {
     this.setState({
       shopname: e.target.value,
+      message: "",
     });
   };
 
@@ -41,13 +39,10 @@ class CreateShopPage extends Component {
         .post("http://localhost:3001/isshopalreadycreated", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
-          if (
-            response.status === 200 &&
-            response.data === "Shop already created"
-          ) {
+          if (response.status === 200) {
             this.setState({
               shopcreated: true,
-              shopname: "Test Shop",
+              shopname: response.data,
             });
           }
         });
@@ -60,26 +55,24 @@ class CreateShopPage extends Component {
     const data = {
       shopname: this.state.shopname,
     };
-
     //set the with credentials to true
     axios.defaults.withCredentials = true;
-    //make a post request with the user dat a
+    //make a post request with the user data
     axios
       .post("http://localhost:3001/shopNameAvailable", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
-        if (
-          response.status === 200 &&
-          response.data === "Shop name is available."
-        ) {
-          this.setState({
-            message: response.data,
-          });
-        } else {
+        if (response.status === 200) {
           this.setState({
             message: response.data,
           });
         }
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+        this.setState({
+          message: error.response.data,
+        });
       });
   };
 
@@ -94,26 +87,30 @@ class CreateShopPage extends Component {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
 
-    axios.post("http://localhost:3001/createshop", data).then((response) => {
-      console.log("Status Code : ", response.status);
-      if (response.status === 200 && response.data === "Shop Created") {
+    axios
+      .post("http://localhost:3001/createshop", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200) {
+          this.setState({
+            message: response.data,
+            shopcreated: true,
+          });
+        }
+      })
+      .catch((error) => {
+        console.log(error.response.data);
         this.setState({
-          message: response.data,
-          shopcreated: true,
+          message: error.response.data,
         });
-      } else {
-        this.setState({
-          message: response.data,
-        });
-      }
-    });
+      });
   };
 
   render() {
     //redirect based on successful login
     let redirectVar = null;
     if (!cookie.load("cookie")) {
-      redirectVar = <Navigate to="/login" />;
+      redirectVar = <Navigate to="/" />;
     }
     if (this.state.shopcreated) {
       redirectVar = <Navigate to={"/shoppage/" + this.state.shopname} />;
@@ -161,11 +158,11 @@ class CreateShopPage extends Component {
                   >
                     Create Shop
                   </Button>
+                  <p>
+                    Your shop name will appear in your shop and next to each of
+                    your listing throughout Etsy.
+                  </p>
                 </div>
-                <p>
-                  Your shop name will appear in your shop and next to each of
-                  your listing throughout Etsy.
-                </p>
               </div>
             </div>
           </div>
@@ -174,5 +171,5 @@ class CreateShopPage extends Component {
     );
   }
 }
-//export Login Component
+//export CreateShop Component
 export default CreateShopPage;

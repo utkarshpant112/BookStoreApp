@@ -57,6 +57,11 @@ main {
   height: 200px;
 }
 
+.favorite-button-image {
+  width: 5px;
+  height: 5px;
+}
+
 .product-card {
   width: 275px;
   height: 325px;

@@ -13,6 +13,7 @@ import Product from "../components/Product";
 import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
 import { storage_bucket } from "../Utilities/firebase";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import SearchBox from "../components/Searchbox";
 
 //Define Shop Page Component
 const FavoritesPage = () => {
@@ -110,6 +111,7 @@ const FavoritesPage = () => {
         <br></br>
         <div>
           <h2>Favorite Items</h2>
+          <SearchBox></SearchBox>
           <div className="products">
             <Row>
               {products.map((product) => (

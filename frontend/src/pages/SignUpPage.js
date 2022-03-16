@@ -1,41 +1,46 @@
-import React, { Component, useState } from "react";
-import axios from "axios";
-import cookie from "react-cookies";
+import React, { useState } from "react";
 import { Navigate } from "react-router";
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../actions/userActions";
+import cookie from "react-cookies";
 
-//Define a Login Component
-function SignUpPage(props) {
+//Define a Signup Page Component
+export default function SignUpPage(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [authFlag, setaAthFlag] = useState("");
   const [message, setMessage] = useState("");
-  const [isLoggedIn, setisLoggedIn] = useState(false);
-
+  const counter = useSelector((state) => state.userSignin.error);
   const dispatch = useDispatch();
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
     setName(e.target.value);
+    setMessage("");
   };
   //email change handler to update state variable with the text entered by the user
   const emailChangeHandler = (e) => {
     setEmail(e.target.value);
+    setMessage("");
   };
   //password change handler to update state variable with the text entered by the user
   const passwordChangeHandler = (e) => {
     setPassword(e.target.value);
-  };
-  //submit Login handler to send a request to the node backend
-  const submitSignUp = (e) => {
-    dispatch(signup(name, email, password));
-    setisLoggedIn(true);
+    setMessage("");
   };
 
-  return isLoggedIn ? (
+  //submit Login handler to send a request to the node backend
+  const submitSignUp = async (e) => {
+    await setMessage("");
+    dispatch(signup(name, email, password)).then((response) => {
+      console.log(counter);
+      if (response !== "") {
+        setMessage(counter);
+      }
+    });
+  };
+
+  return cookie.load("cookie") ? (
     <Navigate to="/home" />
   ) : (
     <div>
@@ -76,9 +81,12 @@ function SignUpPage(props) {
               />
             </div>
             <br></br>
-            <button onClick={submitSignUp} class="btn btn-primary">
-              Create Account
-            </button>
+            <div>
+              <button onClick={submitSignUp} class="btn btn-primary">
+                Create Account
+              </button>
+            </div>
+            <br></br>
             <div class={message ? "visible" : "invisible"}>
               <div class="alert alert-danger">{message}</div>
             </div>
@@ -88,5 +96,3 @@ function SignUpPage(props) {
     </div>
   );
 }
-//export Singup Component
-export default SignUpPage;

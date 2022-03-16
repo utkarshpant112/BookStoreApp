@@ -1,9 +1,6 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import cookie from "react-cookies";
-import { Navigate, useParams } from "react-router";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
+import { useParams } from "react-router";
 import CreateModal from "../Utilities/CreateModal";
 import EditModal from "../Utilities/EditModal";
 import Card from "react-bootstrap/Card";
@@ -11,24 +8,19 @@ import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import Product from "../components/Product";
 import { storage_bucket } from "../Utilities/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 //Define Shop Page Component
-const ShopPage = () => {
+const ShopPage = (props) => {
   var { shopname } = useParams();
 
   const [image, setImage] = useState(undefined);
   const [owner, setOwner] = useState("");
   const [message, setMessage] = useState("");
-  const [refresh, setRefresh] = useState("");
+  const [salescount, setsalescount] = useState("");
   const [products, setProducts] = useState([]);
 
   const [mounted, setMounted] = useState(false);
-
-  // Function to update state
-  const handleUpdate = (text) => {
-    setRefresh(text);
-  };
 
   useEffect(() => {
     console.log(shopname);
@@ -44,22 +36,22 @@ const ShopPage = () => {
     axios
       .get("http://localhost:3001/shopimage/" + shopname)
       .then((response) => {
-        //update the state with the response data
         setImage(response.data.shopimage);
       });
     axios.get("http://localhost:3001/products/" + shopname).then((response) => {
-      //update the state with the response data
       setProducts(response.data);
-      setMounted(true);
     });
+    axios
+      .get("http://localhost:3001/shopsalestotal/" + shopname)
+      .then((response) => {
+        setsalescount(response.data[0].totalsales);
+      });
   }, []);
 
-  //name change handler to update state variable with the text entered by the user
+  //image change handler to update state variable with the text entered by the user
   const imageChangeHandler = (e) => {
     if (e.target.files && e.target.files[0]) {
       if (e.target.files[0] == null) return;
-      console.log(e.target.files[0]);
-      const storage = getStorage();
       const storageRef = ref(storage_bucket, e.target.files[0].name);
       // 'file' comes from the Blob or File API
       uploadBytes(storageRef, e.target.files[0])
@@ -69,7 +61,6 @@ const ShopPage = () => {
         .then((downloadURL) => {
           console.log("Download URL", downloadURL);
           setImage(downloadURL);
-          var headers = new Headers();
           //prevent page from refresh
           e.preventDefault();
           const data = {
@@ -96,7 +87,7 @@ const ShopPage = () => {
         <div>
           <Row>
             <Col md={3}>
-              <div style={{ width: "97%", height: "35%" }}>
+              <div style={{ width: "106.5%", height: "35%" }}>
                 <Card>
                   <img
                     src={
@@ -126,6 +117,13 @@ const ShopPage = () => {
               <h6>{owner.name}</h6>
               <h6>{owner.email}</h6>
               <h6>{owner.phone}</h6>
+              <div
+                class={
+                  message === "Shop owner viewing" ? "visible" : "invisible"
+                }
+              >
+                <h6>Items Sold: {salescount}</h6>
+              </div>
               <br></br>
               <br></br>
               <br></br>
@@ -151,6 +149,7 @@ const ShopPage = () => {
         </div>
         <br></br>
         <br></br>
+        <h3>Products</h3>
         <div>
           <div className="products">
             <Row>

@@ -1,19 +1,15 @@
 import React, { useEffect, useState } from "react";
-import ReactDom from "react-dom";
 import axios from "axios";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { storage_bucket } from "../Utilities/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { useParams } from "react-router";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import Select from "react-select";
 
 export default function CreateModal(props) {
   const { shopname } = props;
-  const [isOpen, setIsOpen] = useState(false);
-
   const [show, setShow] = useState(false);
-
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [name, setName] = useState("");
@@ -22,19 +18,34 @@ export default function CreateModal(props) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [countInStock, setCountInStock] = useState("");
+  const [options, setOptions] = useState("");
   const [message, setMessage] = useState("");
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
     setName(e.target.value);
   };
-
-  //name change handler to update state variable with the text entered by the user
+  //category change handler to update state variable with the text entered by the user
+  const categoryChangeHandler = (e) => {
+    setCategory(e.label);
+  };
+  //price change handler to update state variable with the text entered by the user
+  const priceChangeHandler = (e) => {
+    setPrice(e.target.value);
+  };
+  //description change handler to update state variable with the text entered by the user
+  const descriptionChangeHandler = (e) => {
+    setDescription(e.target.value);
+  };
+  //instock change handler to update state variable with the text entered by the user
+  const countInStockChangeHandler = (e) => {
+    setCountInStock(e.target.value);
+  };
+  //image change handler to update state variable with the text entered by the user
   const imageChangeHandler = (e) => {
     if (e.target.files && e.target.files[0]) {
       if (e.target.files[0] == null) return;
       console.log(e.target.files[0]);
-      const storage = getStorage();
       const storageRef = ref(storage_bucket, e.target.files[0].name);
       // 'file' comes from the Blob or File API
       uploadBytes(storageRef, e.target.files[0])
@@ -47,26 +58,15 @@ export default function CreateModal(props) {
         });
     }
   };
-  //name change handler to update state variable with the text entered by the user
-  const categoryChangeHandler = (e) => {
-    setCategory(e.target.value);
-  };
-  //name change handler to update state variable with the text entered by the user
-  const priceChangeHandler = (e) => {
-    setPrice(e.target.value);
-  };
-  //name change handler to update state variable with the text entered by the user
-  const descriptionChangeHandler = (e) => {
-    setDescription(e.target.value);
-  };
 
-  //name change handler to update state variable with the text entered by the user
-  const countInStockChangeHandler = (e) => {
-    setCountInStock(e.target.value);
-  };
+  useEffect(() => {
+    axios.get("http://localhost:3001/categories").then((response) => {
+      //update the state with the response data
+      setOptions(response.data);
+    });
+  }, []);
 
   const addProduct = (e) => {
-    var headers = new Headers();
     //prevent page from refresh
     e.preventDefault();
     const data = {
@@ -107,7 +107,7 @@ export default function CreateModal(props) {
           <Modal.Title>Add Product</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div style={{ width: "54%", height: "35%" }}>
+          <div style={{ width: "59%", height: "35%" }}>
             <Card>
               <img
                 src={
@@ -157,14 +157,12 @@ export default function CreateModal(props) {
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>
-            <input
-              onChange={categoryChangeHandler}
-              type="text"
-              class="form-control"
-              name="category"
+            <Select
               value={category}
-              placeholder="Category of product"
-            />
+              options={options}
+              placeholder={category}
+              onChange={categoryChangeHandler}
+            ></Select>
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>
@@ -174,23 +172,25 @@ export default function CreateModal(props) {
               class="form-control"
               name="countInStock"
               value={countInStock}
-              placeholder="Count of InStock product"
+              placeholder="Quantity of product"
             />
           </div>
           <br></br>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={addProduct}>
-            Add Product
-          </Button>
-          <br></br>
-          <div class={message ? "visible" : "invisible"}>
-            <div class="alert alert-primary">{message}</div>
+          <div>
+            <Button variant="secondary" onClick={handleClose}>
+              Close
+            </Button>
+            <Button variant="primary" onClick={addProduct}>
+              Add Product
+            </Button>
           </div>
+          <br></br>
         </Modal.Footer>
+        <div class={message ? "visible" : "invisible"}>
+          <div class="alert alert-primary">{message}</div>
+        </div>
       </Modal>
     </>
   );

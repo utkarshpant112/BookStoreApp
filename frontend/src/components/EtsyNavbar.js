@@ -87,7 +87,7 @@ function EtsyNavbar(props) {
               Cart
             </Link>
           </Nav>
-          {props.user ? (
+          {cookie.load("cookie") ? (
             <ul class="nav navbar-nav navbar-right">
               <li>
                 <Link to="/" onClick={handleLogout} className="nav-link">

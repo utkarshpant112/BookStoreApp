@@ -2,40 +2,53 @@ import React, { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { login, signin } from "../actions/userActions";
-
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../actions/userActions";
 import { Navigate } from "react-router";
+import cookie from "react-cookies";
 
 export default function LoginModal(props) {
   const [show, setShow] = useState(props.show);
-  const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [isloggedin, setisloggedin] = useState(false);
+  const [errormessage, seterrorMessage] = useState("");
+  const counter = useSelector((state) => state.userSignin.error);
 
   const dispatch = useDispatch();
 
-  //name change handler to update state variable with the text entered by the user
+  //email change handler to update state variable with the text entered by the user
   const emailChangeHandler = (e) => {
     setEmail(e.target.value);
+    //remove error message if any
+    seterrorMessage("");
   };
 
-  //name change handler to update state variable with the text entered by the user
+  //password change handler to update state variable with the text entered by the user
   const passwordChangeHandler = (e) => {
     setPassword(e.target.value);
+    //remove error message if any
+    seterrorMessage("");
+  };
+
+  //Closing the modal
+  const handleClose = () => {
+    seterrorMessage("");
+    setShow(false);
   };
 
   //submit Login handler to send a request to the node backend
-  const submitLogin = (e) => {
-    dispatch(login(email, password));
-    setisloggedin(true);
+  const submitLogin = async (e) => {
+    await seterrorMessage("");
+    dispatch(login(email, password)).then((response) => {
+      console.log(response);
+      if (response !== "") {
+        seterrorMessage(counter);
+      }
+    });
   };
 
-  return isloggedin ? (
+  return cookie.load("cookie") ? (
     <Navigate to={props.redirectTo} />
   ) : (
     <>
@@ -80,11 +93,14 @@ export default function LoginModal(props) {
                     />
                   </div>
                   <br></br>
-                  <Button variant="success" onClick={submitLogin}>
-                    Login
-                  </Button>
-                  <div class={message ? "visible" : "invisible"}>
-                    <div class="alert alert-danger">{message}</div>
+                  <div>
+                    <Button variant="success" onClick={submitLogin}>
+                      Login
+                    </Button>
+                  </div>
+                  <br></br>
+                  <div class={errormessage ? "visible" : "invisible"}>
+                    <div class="alert alert-danger">{errormessage}</div>
                   </div>
                   <div className="mb-3">
                     New customer?{" "}

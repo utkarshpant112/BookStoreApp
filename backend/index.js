@@ -64,147 +64,14 @@ var con = mysql.createConnection({
   database: "etsy",
 });
 
-var storage = multer.diskStorage({
-  destination: (req, file, callBack) => {
-    callBack(null, "./public/images/"); // './public/images/' directory name where save the file
-  },
-  filename: (req, file, callBack) => {
-    callBack(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-var upload = multer({
-  storage: storage,
-});
-
 con.connect(function (err) {
   if (err) throw err;
   console.log("Connected!");
 });
 
-const products = [
-  {
-    name: "Boho wall decor",
-    id: 1,
-    category: "Decor",
-    image: "/images/p1.jpg",
-    price: 120,
-    countInStock: 0,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Social Worker Shirt",
-    id: 2,
-    category: "Shirts",
-    image: "/images/p2.jpg",
-    price: 100,
-    countInStock: 12,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 8,
-    description: "Good home shirt",
-  },
-  {
-    name: "The Boston Cardigan",
-    id: 3,
-    category: "Cardigan",
-    image: "/images/p3.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Boho wall decor 2",
-    id: 4,
-    category: "Decor",
-    image: "/images/p4.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Casual shit",
-    id: 5,
-    category: "Shirt",
-    image: "/images/p5.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Shirt",
-    id: 6,
-    category: "Decor",
-    image: "/images/p6.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Funky shirt",
-    id: 7,
-    category: "Decor",
-    image: "/images/p7.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Faded shirt",
-    id: 8,
-    category: "Decor",
-    image: "/images/p8.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-  {
-    name: "Okay shirt",
-    id: 9,
-    category: "Decor",
-    image: "/images/p9.jpg",
-    price: 120,
-    countInStock: 10,
-    brand: "rldh",
-    rating: 4.5,
-    numReviews: 10,
-    description: "Good home decor",
-  },
-];
-
 //Route to handle Post Request Call
 app.post("/login", function (req, res) {
-  // Object.keys(req.body).forEach(function(key){
-  //     req.body = JSON.parse(key);
-  // });
-  // var username = req.body.username;
-  // var password = req.body.password;
   console.log("Inside Login Post Request");
-  //console.log("Req Body : ", username + "password : ",password);
   console.log("Req Body : ", req.body);
   con.query(
     "SELECT * FROM users where email ='" + req.body.email + "'",
@@ -213,36 +80,32 @@ app.post("/login", function (req, res) {
         console.log(err);
         return;
       }
-
-      console.log(result);
-      if (result === null) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Email is not registered with us");
-      }
-
-      console.log(result);
-
-      if (
-        result[0].email === req.body.email &&
-        result[0].password === req.body.password
-      ) {
-        res.cookie("cookie", "admin", {
-          maxAge: 900000,
-          httpOnly: false,
-          path: "/",
-        });
-        req.session.user = result;
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end(JSON.stringify(result));
+      if (result.length > 0) {
+        if (
+          result[0].email === req.body.email &&
+          result[0].password === req.body.password
+        ) {
+          res.cookie("cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/",
+          });
+          req.session.user = result;
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end(JSON.stringify(result));
+        } else {
+          res.writeHead(400, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Incorrect Password");
+        }
       } else {
         res.writeHead(400, {
           "Content-Type": "text/plain",
         });
-        res.end("Incorrect Password");
+        res.end("Email is not registered with us");
       }
     }
   );
@@ -250,13 +113,7 @@ app.post("/login", function (req, res) {
 
 //Route to handle Post Request Call
 app.post("/signup", function (req, res) {
-  // Object.keys(req.body).forEach(function(key){
-  //     req.body = JSON.parse(key);
-  // });
-  // var username = req.body.username;
-  // var password = req.body.password;
   console.log("Inside Signup Post Request");
-  //console.log("Req Body : ", username + "password : ",password);
   console.log("Req Body : ", req.body);
   con.query(
     "INSERT INTO users (name, email, password) VALUES ('" +
@@ -268,47 +125,34 @@ app.post("/signup", function (req, res) {
       "')",
     function (err, result) {
       if (err) {
-        console.log(err);
-        return;
+        if (err.code === "ER_DUP_ENTRY") {
+          console.log(err);
+          res.writeHead(400, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Email is already registered with us");
+          return;
+        }
       }
-      console.log(result);
-      console.log(result);
-      if (result === null) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Email is registered with us");
-      } else {
-        con.query(
-          "SELECT * FROM users where email ='" + req.body.email + "'",
-          function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-
-            console.log(result);
-            if (result === null) {
-              res.writeHead(400, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Email is not registered with us");
-            }
-
-            console.log(result);
-            res.cookie("cookie", "admin", {
-              maxAge: 900000,
-              httpOnly: false,
-              path: "/",
-            });
-            req.session.user = result;
-            res.writeHead(200, {
-              "Content-Type": "text/plain",
-            });
-            res.end(JSON.stringify(result));
+      con.query(
+        "SELECT * FROM users where email ='" + req.body.email + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
           }
-        );
-      }
+          res.cookie("cookie", "admin", {
+            maxAge: 900000,
+            httpOnly: false,
+            path: "/",
+          });
+          req.session.user = result;
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
     }
   );
 });
@@ -323,7 +167,6 @@ app.get("/userprofile/:email", function (req, res) {
         console.log(err);
         return;
       }
-
       // req.session.user = result;
       res.writeHead(200, {
         "Content-Type": "text/plain",
@@ -334,7 +177,7 @@ app.get("/userprofile/:email", function (req, res) {
 });
 
 //Route to handle Post Request Call
-app.post("/updateprofile", upload.single("image"), function (req, res) {
+app.post("/updateprofile", function (req, res) {
   console.log("Inside Update Profile Post Request");
   console.log("Req Body : ", req.body);
   con.query(
@@ -361,59 +204,20 @@ app.post("/updateprofile", upload.single("image"), function (req, res) {
       "'",
     function (err, result) {
       if (err) {
-        console.log(err);
-        return;
+        if (err.code === "ER_DUP_ENTRY") {
+          res.writeHead(400, {
+            "Content-Type": "text/plain",
+          });
+          res.end(
+            "Profile not updated as email is registered with another user."
+          );
+          return;
+        }
       }
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
       res.end("Profile updated");
-    }
-  );
-});
-
-//Route to handle Post Request Call
-app.post("/signup", function (req, res) {
-  // Object.keys(req.body).forEach(function(key){
-  //     req.body = JSON.parse(key);
-  // });
-  // var username = req.body.username;
-  // var password = req.body.password;
-  console.log("Inside Signup Post Request");
-  //console.log("Req Body : ", username + "password : ",password);
-  console.log("Req Body : ", req.body);
-  con.query(
-    "INSERT INTO users (name, email, password) VALUES ('" +
-      req.body.name +
-      "','" +
-      req.body.email +
-      "','" +
-      req.body.password +
-      "')",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(result);
-      console.log(result);
-      if (result === null) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Email is registered with us");
-      } else {
-        res.cookie("cookie", "admin", {
-          maxAge: 900000,
-          httpOnly: false,
-          path: "/",
-        });
-        req.session.user = result;
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("User Registered");
-      }
     }
   );
 });
@@ -428,12 +232,17 @@ app.post("/shopNameAvailable", function (req, res) {
         return;
       }
       // req.session.user = result;
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
+
+      console.log(result);
       if (result < 1) {
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
         res.end("Shop name is available.");
       } else {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
+        });
         res.end("Shop name is not available.");
       }
     }
@@ -450,14 +259,18 @@ app.post("/isshopalreadycreated", function (req, res) {
         return;
       }
       // req.session.user = result;
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      console.log(result[0]);
+
+      console.log(result[0].shopname);
       if (result[0].shopname == null) {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
+        });
         res.end("Shop hasn't been created yet");
       } else {
-        res.end("Shop already created");
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        res.end(result[0].shopname);
       }
     }
   );
@@ -558,13 +371,6 @@ app.post("/updateproduct", function (req, res) {
   );
 });
 
-app.post("/upload", upload.single("image"), (req, res) => {
-  if (!req.file) {
-    console.log("No file upload");
-  } else {
-    console.log(req.file.filename);
-  }
-});
 //Route to get All Products when user visits the Home Page
 app.get("/api/products", function (req, res) {
   console.log("Inside Products");
@@ -761,6 +567,42 @@ app.get("/search/:name", function (req, res) {
       res.end(JSON.stringify(result));
     }
   );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/shopsalestotal/:shopname", function (req, res) {
+  console.log("Inside Shopname products");
+  const shopname = req.params.shopname;
+  con.query(
+    "select sum(totalsales) as totalsales from products where shopname='" +
+      shopname +
+      "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result));
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/categories", function (req, res) {
+  console.log("Inside Categories");
+  con.query("Select * from categories", function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify(result));
+  });
 });
 
 //start your server on port 3001
