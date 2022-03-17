@@ -1,14 +1,12 @@
-import { Component, useContext } from "react";
-import { Store } from "../Store";
+import { Component } from "react";
 import { Helmet } from "react-helmet-async";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import MessageBox from "../components/MessageBox";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
 import axios from "axios";
 
@@ -30,7 +28,6 @@ class CartPage extends Component {
   }
 
   checkoutHandler = (e) => {
-    var headers = new Headers();
     //prevent page from refresh
     e.preventDefault();
     this.state.cartItems.map((item) => {
@@ -50,20 +47,18 @@ class CartPage extends Component {
         console.log("Status Code : ", response.status);
         if (response.status === 200 && response.data === "order Created") {
           this.setState({
-            authFlag: true,
             message: "Order Created",
           });
           localStorage.removeItem("cartItems");
         } else {
           this.setState({
-            authFlag: false,
             message: response.data,
           });
           localStorage.removeItem("cartItems");
         }
       });
     });
-
+    localStorage.removeItem("cartItems");
     let url = "/mypurchases";
     window.location.href = url;
   };
@@ -129,7 +124,10 @@ class CartPage extends Component {
                   <ListGroup.Item>
                     <h3>
                       Subtotal (
-                      {this.state.cartItems.reduce((a, c) => a + c.quantity, 0)}{" "}
+                      {this.state.cartItems.reduce(
+                        (a, c) => parseInt(a) + parseInt(c.quantity),
+                        0
+                      )}{" "}
                       items) : $
                       {this.state.cartItems.reduce(
                         (a, c) => a + c.price * c.quantity,

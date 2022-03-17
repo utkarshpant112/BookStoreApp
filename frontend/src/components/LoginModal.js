@@ -41,7 +41,6 @@ export default function LoginModal(props) {
   const submitLogin = async (e) => {
     await seterrorMessage("");
     dispatch(login(email, password)).then((response) => {
-      console.log(response);
       if (response !== "") {
         seterrorMessage(counter);
       }
@@ -49,7 +48,7 @@ export default function LoginModal(props) {
   };
 
   return cookie.load("cookie") ? (
-    <Navigate to={props.redirectTo} />
+    <Navigate to={props.redirectTo} state={"loggedin"} />
   ) : (
     <>
       <Link to={""} onClick={handleShow} className="nav-link">

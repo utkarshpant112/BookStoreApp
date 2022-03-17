@@ -1,6 +1,6 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import axios from "axios";
-import { Component, useContext, useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Card from "react-bootstrap/Card";
@@ -8,15 +8,16 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import { Helmet } from "react-helmet-async";
-
-import cookie from "react-cookies";
 import { Navigate } from "react-router";
 import { Link } from "react-router-dom";
+import cookie from "react-cookies";
 
 function ProductPage(props) {
   const { id } = useParams();
   const [product, setProduct] = useState("");
+  const [addToCartQuantity, setaddToCartQuantity] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     console.log(id);
@@ -29,43 +30,58 @@ function ProductPage(props) {
       });
   }, []);
 
+  //instock change handler to update state variable with the text entered by the user
+  const quantityChangeHandler = (e) => {
+    setaddToCartQuantity(e.target.value);
+    setMessage("");
+  };
+
   const addToCartHandler = async () => {
-    if (localStorage.getItem("cartItems") != null) {
+    if (!cookie.load("cookie")) {
+      setMessage("You must be logged in to add items to cart.");
+    } else if (product.shopname === localStorage.getItem("shopname")) {
+      setMessage("You cannot add your own item to your cart");
+    } else if (localStorage.getItem("cartItems") != null) {
       var cartItems = JSON.parse(localStorage.getItem("cartItems"));
       const existItem = cartItems.find((x) => x.id === product.id);
-      console.log(existItem);
-      const quantity = existItem ? existItem.quantity + 1 : 1;
-      if (product.instock < quantity) {
-        window.alert("Sorry. Product is out of stock");
+      // console.log(existItem.quantity);
+      const quantity = existItem
+        ? parseInt(existItem.quantity) + parseInt(addToCartQuantity)
+        : parseInt(addToCartQuantity);
+      console.log(quantity);
+      if (parseInt(product.instock) < parseInt(quantity)) {
+        setMessage("Quantity of product you entered is not available.");
         return;
       }
       if (existItem === undefined) {
         cartItems[cartItems.length] = {
-          id: product.id,
-          quantity: 1,
+          quantity: quantity,
           ...product,
         };
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        setMessage("Product added to cart.");
         return;
       }
       const index = cartItems
         ? cartItems.findIndex((item) => item.id === product.id)
         : 0;
       cartItems[index] = {
-        id: product.id,
         quantity: quantity,
         ...product,
       };
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
-    } else {
+      setMessage("Product added to cart.");
+    } else if (addToCartQuantity <= product.instock) {
       var cartItems = [
         {
-          id: product.id,
-          quantity: 1,
+          quantity: addToCartQuantity,
           ...product,
         },
       ];
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      setMessage("Product added to cart.");
+    } else {
+      setMessage("Quantity of product you entered is not available.");
     }
   };
 
@@ -92,11 +108,10 @@ function ProductPage(props) {
               </Helmet>
               <h3>{product.name}</h3>
             </ListGroup.Item>
-            <ListGroup.Item>Price : ${product.price}</ListGroup.Item>
-            <ListGroup.Item>
-              Description:
-              <p>{product.description}</p>
-            </ListGroup.Item>
+            <ListGroup.Item>Description: {product.description}</ListGroup.Item>
+            <ListGroup.Item>Category: {product.category}</ListGroup.Item>
+            <ListGroup.Item>Total Sold: {product.totalsales}</ListGroup.Item>
+            <ListGroup.Item>Available: {product.instock}</ListGroup.Item>
             <Card>
               <Card.Body>
                 <ListGroup.Item>
@@ -131,6 +146,17 @@ function ProductPage(props) {
 
                   {product.instock > 0 && (
                     <ListGroup.Item>
+                      <div class="form-group" style={{ width: "100%" }}>
+                        <input
+                          onChange={quantityChangeHandler}
+                          type="text"
+                          class="form-control"
+                          name="countInStock"
+                          value={addToCartQuantity}
+                          placeholder="Quantity of product"
+                        />
+                      </div>
+                      <br></br>
                       <div className="d-grid">
                         <Button onClick={addToCartHandler} variant="primary">
                           Add to Cart
@@ -139,6 +165,12 @@ function ProductPage(props) {
                         <Button onClick={checkoutHandler} variant="primary">
                           Proceed to Checkout
                         </Button>
+                      </div>
+                      <br></br>
+                      <div>
+                        <div class={message ? "visible" : "invisible"}>
+                          <div class="alert alert-primary">{message}</div>
+                        </div>
                       </div>
                     </ListGroup.Item>
                   )}

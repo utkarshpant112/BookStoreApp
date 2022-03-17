@@ -28,6 +28,7 @@ export const login = (email, password) => async (dispatch) => {
       console.log("Status data : ", response.data);
       if (response.status === 200) {
         localStorage.setItem("email", email);
+        localStorage.setItem("shopname", response.data[0].shopname);
         dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
       }
       return "";
@@ -70,6 +71,7 @@ export const signup = (name, email, password) => async (dispatch) => {
 export const logout = (email, password) => async (dispatch) => {
   cookie.remove("cookie", { path: "/" });
   localStorage.removeItem("email");
+  localStorage.removeItem("shopname");
   localStorage.removeItem("cartItems");
   dispatch({ type: USER_LOGOUT });
 };

@@ -1,15 +1,11 @@
-import React, { useEffect, useReducer, useState } from "react";
-import { Link, useNavigate, useLocation, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import axios from "axios";
-import { getError } from "../utils";
 import { Helmet } from "react-helmet-async";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
-import MessageBox from "../components/MessageBox";
-import Button from "react-bootstrap/Button";
 import Product from "../components/Product";
-import LinkContainer from "react-router-bootstrap/LinkContainer";
 
 const prices = [
   {
@@ -25,41 +21,31 @@ const prices = [
     value: "201-1000",
   },
 ];
-export default function SearchPage({ route, navigation }) {
-  const navigate = useNavigate();
-  const { search } = useLocation();
-  // const { queryname } = route.params;
-
+export default function SearchPage(props) {
   const [products, setproducts] = useState([]);
   const [filter, setfilter] = useState("");
   const [availswitch, setavailswitch] = useState("off");
   const [excluded, setexcluded] = useState([]);
-  const [reloadComponent, setreloadComponent] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { name } = useParams();
 
-  const [mounted, setMounted] = useState(false);
-
-  // useEffect(() => {}, [filter, products]);
-
   useEffect(() => {
-    axios.get("/search/" + name).then((response) => {
-      //update the state with the response data
-      console.log(response.data);
-      setproducts(response.data);
-    });
+    var email = "";
+    if (localStorage.getItem("email") !== null) {
+      email = localStorage.getItem("email");
+    }
+    axios
+      .get("/search", {
+        params: {
+          name: name,
+          email: email,
+        },
+      })
+      .then((response) => {
+        setproducts(response.data);
+      });
     setMounted(true);
   }, [name]);
-
-  useEffect(() => {
-    console.log("products updated");
-  }, [products]);
-
-  const filterChangeHandler = async (e) => {
-    let appliedfilter = e.target.value;
-    setfilter(appliedfilter);
-    console.log(filter);
-    await filtering(appliedfilter);
-  };
 
   const switchChangeHandler = async (e) => {
     let value = e.target.value;
@@ -71,8 +57,6 @@ export default function SearchPage({ route, navigation }) {
       }
     }
     setavailswitch(value);
-
-    console.log(value);
     await availfiltering(value);
   };
 
@@ -83,16 +67,9 @@ export default function SearchPage({ route, navigation }) {
         var prod = products.filter((product) => product.instock !== 0);
         var outofstock = products.filter((product) => product.instock === 0);
         await setexcluded(outofstock);
-        console.log(excluded);
-        // setproducts([]);
         await setproducts(prod);
-        console.log(products);
         break;
       case "off":
-        console.log("off");
-        console.log(products);
-        console.log(excluded);
-
         await setproducts([...products, ...excluded]);
         break;
       default:
@@ -100,27 +77,27 @@ export default function SearchPage({ route, navigation }) {
     }
   };
 
+  const filterChangeHandler = async (e) => {
+    let appliedfilter = e.target.value;
+    setfilter(appliedfilter);
+    await filtering(appliedfilter);
+  };
+
   const filtering = async (filter) => {
     switch (filter) {
       case "lowest":
-        console.log("lowest");
         var prod = products.sort((a, b) => {
           return a.price - b.price;
         });
-        // setproducts([]);
         await setproducts(prod);
         break;
       case "highest":
-        console.log("higest");
         var prod = products.sort((a, b) => {
           return b.price - a.price;
         });
-        console.log(prod);
-        // setproducts([]);
         await setproducts(prod);
         break;
       case "quantity":
-        console.log("quantity");
         await setproducts(
           products.sort((a, b) => {
             return b.instock - a.instock;
@@ -128,7 +105,6 @@ export default function SearchPage({ route, navigation }) {
         );
         break;
       case "available":
-        console.log("available");
         await setproducts(
           products.sort((a, b) => {
             return b.totalsales - a.totalsales;

@@ -24,22 +24,27 @@ export default function CreateModal(props) {
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
     setName(e.target.value);
+    setMessage("");
   };
   //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
     setCategory(e.label);
+    setMessage("");
   };
   //price change handler to update state variable with the text entered by the user
   const priceChangeHandler = (e) => {
     setPrice(e.target.value);
+    setMessage("");
   };
   //description change handler to update state variable with the text entered by the user
   const descriptionChangeHandler = (e) => {
     setDescription(e.target.value);
+    setMessage("");
   };
   //instock change handler to update state variable with the text entered by the user
   const countInStockChangeHandler = (e) => {
     setCountInStock(e.target.value);
+    setMessage("");
   };
   //image change handler to update state variable with the text entered by the user
   const imageChangeHandler = (e) => {
@@ -81,14 +86,22 @@ export default function CreateModal(props) {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://localhost:3001/addproduct", data).then((response) => {
-      console.log("Status Code : ", response.status);
-      if (response.status === 200 && response.data === "Product Added") {
-        setMessage("Product has been added");
-      } else {
-        setMessage("Product not added");
-      }
-    });
+    axios
+      .post("http://localhost:3001/addproduct", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200 && response.data === "Product Added") {
+          setMessage("Product has been added");
+        } else {
+          setMessage("Product not added");
+        }
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+        this.setState({
+          message: error.response.data,
+        });
+      });
   };
 
   return (

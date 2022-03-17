@@ -1,25 +1,41 @@
-import { Component, useEffect, useReducer, useState } from "react";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import axios from "axios";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
 import { useSelector } from "react-redux";
-import Store from "../Store";
-
-import { connect } from "react-redux";
+import { useLocation } from "react-router";
 
 function HomePage(props) {
   const [products, setproducts] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const userInfo = useSelector((state) => state.userInfo);
+  const userInfo = useSelector((state) => state.userSignin.userInfo);
+  const { state } = useLocation();
 
   useEffect(() => {
-    console.log(userInfo);
-    axios.get("http://localhost:3001/api/products").then((response) => {
-      //update the state with the response data
-      setproducts(products.concat(response.data));
-    });
+    if (state != null) {
+      const { data } = state;
+      console.log(data);
+    }
+    if (localStorage.getItem("email") !== null) {
+      console.log(localStorage.getItem("email"));
+      axios
+        .get(
+          "http://localhost:3001/othersellerproducts/" +
+            localStorage.getItem("email")
+        )
+        .then((response) => {
+          console.log(response.data);
+          //update the state with the response data
+          setproducts(products.concat(response.data));
+        });
+    } else {
+      axios.get("http://localhost:3001/api/products").then((response) => {
+        //update the state with the response data
+        setproducts(products.concat(response.data));
+      });
+    }
     setMounted(true);
   }, []);
 

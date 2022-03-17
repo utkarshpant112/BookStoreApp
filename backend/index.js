@@ -331,6 +331,12 @@ app.post("/addproduct", function (req, res) {
       "')",
     function (err, result) {
       if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Product with same name exists");
+        }
         console.log(err);
         return;
       }
@@ -519,10 +525,27 @@ app.post("/createorder", function (req, res) {
         console.log(err);
         return;
       }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Order Creted");
+      con.query(
+        "UPDATE products SET instock= instock-" +
+          req.body.quantity +
+          ",totalsales= totalsales+" +
+          req.body.quantity +
+          " where shopname='" +
+          req.body.shopname +
+          "' and name='" +
+          req.body.name +
+          "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Order Creted");
+        }
+      );
     }
   );
 });
@@ -532,7 +555,9 @@ app.get("/orders/:email", function (req, res) {
   console.log("Inside orders");
   const email = req.params.email;
   con.query(
-    "Select * from orders where customeremail='" + email + "'",
+    "Select * from orders where customeremail='" +
+      email +
+      "' order by dateofpurchase asc",
     function (err, result) {
       if (err) {
         console.log(err);
@@ -546,27 +571,58 @@ app.get("/orders/:email", function (req, res) {
   );
 });
 
-app.get("/search/:name", function (req, res) {
+app.get("/search", function (req, res) {
   console.log("Inside Products 1");
-  console.log(req.params.name);
-  const id = req.params.id;
-  con.query(
-    "Select * from products where name like '%" +
-      req.params.name +
-      "%' or category like '%" +
-      req.params.name +
-      "%'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
+  console.log(req.query.name);
+  if (req.query.email === "") {
+    con.query(
+      "Select * from products where name like '%" +
+        req.query.name +
+        "%' or category like '%" +
+        req.query.name +
+        "%'",
+      function (err, result) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify(result));
       }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result));
-    }
-  );
+    );
+  } else {
+    con.query(
+      "Select * from users where email='" + req.query.email + "'",
+      function (err, result) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log(result[0].shopname);
+        con.query(
+          "Select * from (select * from products where shopname!='" +
+            result[0].shopname +
+            "') as filteredproducts where name like '%" +
+            req.query.name +
+            "%' or category like '%" +
+            req.query.name +
+            "%'",
+          function (err, result) {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+            });
+            res.end(JSON.stringify(result));
+          }
+        );
+      }
+    );
+  }
 });
 
 //Route to get All Products when user visits the Home Page
@@ -603,6 +659,35 @@ app.get("/categories", function (req, res) {
     });
     res.end(JSON.stringify(result));
   });
+});
+
+//Route to get other Products when user visits the Home Page
+app.get("/othersellerproducts/:email", function (req, res) {
+  console.log("Inside othersellerproducts");
+  const email = req.params.email;
+  con.query(
+    "Select * from users where email='" + email + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(result[0].shopname);
+      con.query(
+        "Select * from products where shopname!='" + result[0].shopname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
+    }
+  );
 });
 
 //start your server on port 3001
