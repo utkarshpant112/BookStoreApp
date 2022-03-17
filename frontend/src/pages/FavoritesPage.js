@@ -24,6 +24,23 @@ const FavoritesPage = () => {
   const [message, setMessage] = useState("");
   const [refresh, setRefresh] = useState("");
   const [products, setProducts] = useState([]);
+  const [filteredproducts, setfilteredProducts] = useState([]);
+  const [searchField, setSearchField] = useState("");
+
+  const handleChange = (e) => {
+    let currentList = [];
+    let newList = [];
+    setSearchField(e.target.value);
+    if (searchField !== "") {
+      currentList = products;
+      newList = currentList.filter((product) =>
+        product.name.toLowerCase().includes(searchField.toLowerCase())
+      );
+    } else {
+      newList = products;
+    }
+    setfilteredProducts(newList);
+  };
 
   const [mounted, setMounted] = useState(false);
 
@@ -37,47 +54,16 @@ const FavoritesPage = () => {
     axios
       .get("http://localhost:3001/userprofile/" + useremail)
       .then((response) => {
-        //update the state with the response data
         setUser(response.data);
-        // if (response.data.email === localStorage.getItem("email")) {
-        //   setMessage("Shop owner viewing");
-        // }
+      });
+    axios
+      .get("http://localhost:3001/getfavoriteproducts/" + useremail)
+      .then((response) => {
+        setProducts(response.data);
+        setfilteredProducts(response.data);
       });
     setMounted(true);
   }, []);
-
-  //name change handler to update state variable with the text entered by the user
-  const imageChangeHandler = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      if (e.target.files[0] == null) return;
-      console.log(e.target.files[0]);
-      const storage = getStorage();
-      const storageRef = ref(storage_bucket, e.target.files[0].name);
-      // 'file' comes from the Blob or File API
-      uploadBytes(storageRef, e.target.files[0])
-        .then((snapshot) => {
-          return getDownloadURL(snapshot.ref);
-        })
-        .then((downloadURL) => {
-          console.log("Download URL", downloadURL);
-          setImage(downloadURL);
-          var headers = new Headers();
-          //prevent page from refresh
-          e.preventDefault();
-          const data = {
-            shopImage: downloadURL,
-          };
-          //set the with credentials to true
-          axios.defaults.withCredentials = true;
-          //make a post request with the user data
-          axios
-            .post("http://localhost:3001/addshopimage", data)
-            .then((response) => {
-              console.log("Status Code : ", response.status);
-            });
-        });
-    }
-  };
 
   return !products ? null : (
     <>
@@ -109,18 +95,29 @@ const FavoritesPage = () => {
           </Row>
         </div>
         <br></br>
-        <div>
+        <Row>
           <h2>Favorite Items</h2>
-          <SearchBox></SearchBox>
-          <div className="products">
-            <Row>
-              {products.map((product) => (
-                <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
-                  <Product product={product}></Product>
-                </Col>
-              ))}
-            </Row>
+        </Row>
+        <Row>
+          <div className="pa2">
+            <input
+              style={{ width: "50%" }}
+              className="pa3 bb br3 grow b--none bg-lightest-blue ma3"
+              type="search"
+              placeholder="Search Your favorite items"
+              onChange={handleChange}
+            />
           </div>
+        </Row>
+        <br></br>
+        <div className="products">
+          <Row>
+            {filteredproducts.map((product) => (
+              <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
+                <Product product={product}></Product>
+              </Col>
+            ))}
+          </Row>
         </div>
       </div>
     </>

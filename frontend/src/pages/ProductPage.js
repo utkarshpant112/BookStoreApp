@@ -11,6 +11,7 @@ import { Helmet } from "react-helmet-async";
 import { Navigate } from "react-router";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
+import FavoriteModal from "../components/FavoriteModal";
 
 function ProductPage(props) {
   const { id } = useParams();
@@ -94,11 +95,19 @@ function ProductPage(props) {
     <div>
       <Row>
         <Col md={8}>
-          <img
-            className="img-large"
-            src={product.image}
-            alt={product.name}
-          ></img>
+          <div>
+            <h3>
+              <img
+                className="img-large"
+                src={product.image}
+                alt={product.name}
+              ></img>
+              <FavoriteModal
+                name={product.name}
+                shopname={product.shopname}
+              ></FavoriteModal>
+            </h3>
+          </div>
         </Col>
         <Col md={4}>
           <ListGroup variant="flush">

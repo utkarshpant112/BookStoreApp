@@ -10,7 +10,11 @@ import Select from "react-select";
 export default function CreateModal(props) {
   const { shopname } = props;
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    props.setMounted(false);
+    props.onCloseModal();
+    setShow(false);
+  };
   const handleShow = () => setShow(true);
   const [name, setName] = useState("");
   const [image, setImage] = useState(undefined);

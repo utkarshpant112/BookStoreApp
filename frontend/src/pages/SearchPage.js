@@ -97,14 +97,14 @@ export default function SearchPage(props) {
         });
         await setproducts(prod);
         break;
-      case "quantity":
+      case "available":
         await setproducts(
           products.sort((a, b) => {
             return b.instock - a.instock;
           })
         );
         break;
-      case "available":
+      case "sales":
         await setproducts(
           products.sort((a, b) => {
             return b.totalsales - a.totalsales;
@@ -141,8 +141,8 @@ export default function SearchPage(props) {
           <select value={filter} onChange={filterChangeHandler}>
             <option value="lowest">Price: Low to High</option>
             <option value="highest">Price: High to Low</option>
-            <option value="quantity">Quantity: High to Low</option>
             <option value="available">Availability: High to Low</option>
+            <option value="sales">Total sold: High to Low</option>
           </select>
         </Col>
       </Row>

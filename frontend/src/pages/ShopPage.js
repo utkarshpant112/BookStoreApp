@@ -22,6 +22,12 @@ const ShopPage = (props) => {
 
   const [mounted, setMounted] = useState(false);
 
+  function handleCloseModal() {
+    console.log("this was fired");
+    setMounted(true);
+    setMounted(false);
+  }
+
   useEffect(() => {
     console.log(shopname);
     axios
@@ -134,10 +140,16 @@ const ShopPage = (props) => {
               >
                 <Row>
                   <Col md={6}>
-                    <CreateModal shopname={shopname}></CreateModal>
+                    <CreateModal
+                      setMounted={setMounted}
+                      onCloseModal={handleCloseModal}
+                      shopname={shopname}
+                    ></CreateModal>
                   </Col>
                   <Col md={6}>
                     <EditModal
+                      setMounted={setMounted}
+                      onCloseModal={handleCloseModal}
                       shopname={shopname}
                       products={products}
                     ></EditModal>
