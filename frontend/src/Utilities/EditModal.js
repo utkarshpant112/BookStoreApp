@@ -14,6 +14,13 @@ export default function EditModal(props) {
   const { shopname } = props;
   const [show, setShow] = useState(false);
   const handleClose = () => {
+    setMessage("");
+    setName("");
+    setPrice("");
+    setImage("");
+    setCategory("");
+    setDescription("");
+    setCountInStock("");
     navigate("/shoppage/" + shopname);
     setShow(false);
   };
@@ -52,6 +59,7 @@ export default function EditModal(props) {
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
+    setMessage("");
     setName(e.label);
     axios
       .get("http://localhost:3001/productdetails/" + e.label)
@@ -84,21 +92,26 @@ export default function EditModal(props) {
   //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
     setCategory(e.label);
+    setMessage("");
   };
   //price change handler to update state variable with the text entered by the user
   const priceChangeHandler = (e) => {
     setPrice(e.target.value);
+    setMessage("");
   };
   //description change handler to update state variable with the text entered by the user
   const descriptionChangeHandler = (e) => {
     setDescription(e.target.value);
+    setMessage("");
   };
   //countinstock change handler to update state variable with the text entered by the user
   const countInStockChangeHandler = (e) => {
     setCountInStock(e.target.value);
+    setMessage("");
   };
 
   const updateProduct = (e) => {
+    setMessage("");
     //prevent page from refresh
     e.preventDefault();
     const data = {

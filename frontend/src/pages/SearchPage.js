@@ -6,33 +6,22 @@ import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
+import { useSelector } from "react-redux";
 
-const prices = [
-  {
-    name: "$1 to $50",
-    value: "1-50",
-  },
-  {
-    name: "$51 to $200",
-    value: "51-200",
-  },
-  {
-    name: "$201 to $1000",
-    value: "201-1000",
-  },
-];
 export default function SearchPage(props) {
   const [products, setproducts] = useState([]);
   const [filter, setfilter] = useState("");
+  const [price, setprice] = useState("");
   const [availswitch, setavailswitch] = useState("off");
   const [excluded, setexcluded] = useState([]);
   const [mounted, setMounted] = useState(false);
+  const userInfo = useSelector((state) => state.userInfo);
   const { name } = useParams();
 
   useEffect(() => {
     var email = "";
-    if (localStorage.getItem("email") !== null) {
-      email = localStorage.getItem("email");
+    if (userInfo !== null) {
+      email = userInfo[0].email;
     }
     axios
       .get("/search", {
@@ -116,6 +105,75 @@ export default function SearchPage(props) {
     }
   };
 
+  const priceChangeHandler = async (e) => {
+    let appliedprice = e.target.value;
+    setprice(appliedprice);
+    await pricing(appliedprice);
+  };
+
+  const pricing = async (price) => {
+    var email = "";
+    if (userInfo !== null) {
+      email = userInfo[0].email;
+    }
+    switch (price) {
+      case "first":
+        await axios
+          .get("/search", {
+            params: {
+              name: name,
+              email: email,
+            },
+          })
+          .then((response) => {
+            setproducts(
+              response.data.filter((product) => product.price <= 100)
+            );
+          });
+        break;
+      case "second":
+        await axios
+          .get("/search", {
+            params: {
+              name: name,
+              email: email,
+            },
+          })
+          .then((response) => {
+            setproducts(
+              response.data.filter(
+                (product) => product.price > 100 && product.price <= 500
+              )
+            );
+          });
+        break;
+      case "third":
+        await axios
+          .get("/search", {
+            params: {
+              name: name,
+              email: email,
+            },
+          })
+          .then((response) => {
+            setproducts(response.data.filter((product) => product.price > 500));
+          });
+        break;
+      default:
+        await axios
+          .get("/search", {
+            params: {
+              name: name,
+              email: email,
+            },
+          })
+          .then((response) => {
+            setproducts(response.data);
+          });
+        break;
+    }
+  };
+
   return (
     <div>
       <Helmet>
@@ -123,7 +181,7 @@ export default function SearchPage(props) {
       </Helmet>
 
       <Row className="justify-content-between mb-3">
-        <Col md={6}>
+        <Col md={3}>
           <h2>Search Results</h2>
         </Col>
         <Col>
@@ -135,6 +193,15 @@ export default function SearchPage(props) {
               onChange={switchChangeHandler}
             />
           </Form>
+        </Col>
+        <Col className="text-end">
+          Price{" "}
+          <select value={price} onChange={priceChangeHandler}>
+            <option value="default">No Filter</option>
+            <option value="first">1 to 100</option>
+            <option value="second">100 to 500</option>
+            <option value="third">500+</option>
+          </select>
         </Col>
         <Col className="text-end">
           Sort by{" "}

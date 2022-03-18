@@ -8,11 +8,20 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Select from "react-select";
 import { useDispatch } from "react-redux";
 import { shopPageProductsUpdated } from "../actions/productactions";
+import { useNavigate } from "react-router";
 
 export default function CreateModal(props) {
   const { shopname } = props;
   const [show, setShow] = useState(false);
   const handleClose = () => {
+    setName("");
+    setPrice("");
+    setImage("");
+    setCategory("");
+    setDescription("");
+    setCountInStock("");
+    setMessage("");
+    navigate("/shoppage/" + shopname);
     setShow(false);
   };
   const handleShow = () => setShow(true);
@@ -24,6 +33,7 @@ export default function CreateModal(props) {
   const [countInStock, setCountInStock] = useState("");
   const [options, setOptions] = useState("");
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   //name change handler to update state variable with the text entered by the user

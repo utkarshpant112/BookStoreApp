@@ -155,6 +155,7 @@ function CartPage(props) {
                       Buy Now
                     </Button>
                   </div>
+                  <br></br>
                   <div class={message ? "visible" : "invisible"}>
                     <div class="alert alert-primary">{message}</div>
                   </div>

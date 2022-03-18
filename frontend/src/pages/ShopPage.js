@@ -24,12 +24,12 @@ const ShopPage = (props) => {
     (state) => state.shopPageProductsUpdated
   );
 
-  const [mounted, setMounted] = useState(false);
+  // const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    setMounted(false);
-  }, [shopPageProductsUpdated]);
+  // // useEffect(() => {
+  // //   setMounted(true);
+  // //   setMounted(false);
+  // // }, [shopPageProductsUpdated]);
 
   useEffect(() => {
     console.log(shopname);
@@ -55,7 +55,7 @@ const ShopPage = (props) => {
       .then((response) => {
         setsalescount(response.data[0].totalsales);
       });
-  }, []);
+  }, [shopPageProductsUpdated]);
 
   //image change handler to update state variable with the text entered by the user
   const imageChangeHandler = (e) => {
