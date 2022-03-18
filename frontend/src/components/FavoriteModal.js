@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useDispatch, useSelector } from "react-redux";
+import { favoritesupdated } from "../actions/favoritesaction";
 
 export default function FavoriteModal(props) {
   const [show, setShow] = useState(props.show);
@@ -13,6 +14,7 @@ export default function FavoriteModal(props) {
 
   //Closing the modal
   const handleClose = () => {
+    dispatch(favoritesupdated(false));
     setMessage("");
     setShow(false);
   };
@@ -45,11 +47,13 @@ export default function FavoriteModal(props) {
             setMessage("Added to favorites");
           }
         })
+
         .catch((error) => {
           console.log(error.response.data);
           setMessage(error.response.data);
         });
     }
+    dispatch(favoritesupdated(true));
     handleShow();
     setTimeout(() => {
       handleClose();

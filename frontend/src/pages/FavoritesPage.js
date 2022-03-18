@@ -6,6 +6,7 @@ import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import Product from "../components/Product";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 //Define Shop Page Component
 const FavoritesPage = () => {
@@ -17,6 +18,9 @@ const FavoritesPage = () => {
   const [refresh, setRefresh] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredproducts, setfilteredProducts] = useState([]);
+  const favoriteProductsUpdated = useSelector(
+    (state) => state.favoritesupdated
+  );
 
   const handleChange = (e) => {
     let currentList = [];
@@ -53,7 +57,7 @@ const FavoritesPage = () => {
         setfilteredProducts(response.data);
       });
     setMounted(true);
-  }, []);
+  }, [favoriteProductsUpdated]);
 
   return !products ? null : (
     <>

@@ -1,6 +1,7 @@
 import { createStore, compose, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
 import { currencyReducer } from "./reducers/currencyreducer";
+import { favoritesupdatedreducer } from "./reducers/favoritesreducer";
 import {
   productreducer,
   shopPageProductsUpdatedreducer,
@@ -18,6 +19,7 @@ const initialState = {
   products: null,
   error: "",
   shopPageProductsUpdated: false,
+  favoritesupdated: false,
 };
 const reducer = combineReducers({
   userInfo: userSigninReducer,
@@ -26,6 +28,7 @@ const reducer = combineReducers({
   isLoggedIn: loginstatusReducer,
   products: productreducer,
   shopPageProductsUpdated: shopPageProductsUpdatedreducer,
+  favoritesupdated: favoritesupdatedreducer,
 });
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
