@@ -8,10 +8,11 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import { Helmet } from "react-helmet-async";
-import { Navigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import cookie from "react-cookies";
 import FavoriteModal from "../components/FavoriteModal";
+import { useSelector } from "react-redux";
 
 function ProductPage(props) {
   const { id } = useParams();
@@ -19,6 +20,8 @@ function ProductPage(props) {
   const [addToCartQuantity, setaddToCartQuantity] = useState("");
   const [mounted, setMounted] = useState(false);
   const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const currency = useSelector((state) => state.currency.currency);
 
   useEffect(() => {
     console.log(id);
@@ -87,8 +90,7 @@ function ProductPage(props) {
   };
 
   const checkoutHandler = () => {
-    let url = "/cart";
-    window.location.href = url;
+    navigate("/cart");
   };
 
   return (
@@ -137,7 +139,9 @@ function ProductPage(props) {
                   <ListGroup.Item>
                     <Row>
                       <Col>Price:</Col>
-                      <Col>${product.price}</Col>
+                      <Col>
+                        {currency} {product.price}
+                      </Col>
                     </Row>
                   </ListGroup.Item>
                   <ListGroup.Item>
@@ -147,7 +151,7 @@ function ProductPage(props) {
                         {product.instock > 0 ? (
                           <Badge bg="success">In Stock</Badge>
                         ) : (
-                          <Badge bg="danger">Unavailable</Badge>
+                          <Badge bg="danger">Out of Stock</Badge>
                         )}
                       </Col>
                     </Row>

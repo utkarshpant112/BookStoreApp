@@ -6,13 +6,13 @@ import Modal from "react-bootstrap/Modal";
 import { storage_bucket } from "../Utilities/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Select from "react-select";
+import { useDispatch } from "react-redux";
+import { shopPageProductsUpdated } from "../actions/productactions";
 
 export default function CreateModal(props) {
   const { shopname } = props;
   const [show, setShow] = useState(false);
   const handleClose = () => {
-    props.setMounted(false);
-    props.onCloseModal();
     setShow(false);
   };
   const handleShow = () => setShow(true);
@@ -24,6 +24,7 @@ export default function CreateModal(props) {
   const [countInStock, setCountInStock] = useState("");
   const [options, setOptions] = useState("");
   const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
@@ -69,6 +70,7 @@ export default function CreateModal(props) {
   };
 
   useEffect(() => {
+    dispatch(shopPageProductsUpdated(false));
     axios.get("http://localhost:3001/categories").then((response) => {
       //update the state with the response data
       setOptions(response.data);
@@ -96,6 +98,7 @@ export default function CreateModal(props) {
         console.log("Status Code : ", response.status);
         if (response.status === 200 && response.data === "Product Added") {
           setMessage("Product has been added");
+          dispatch(shopPageProductsUpdated(true));
         } else {
           setMessage("Product not added");
         }

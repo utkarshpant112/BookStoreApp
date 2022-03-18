@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Navigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import { signup } from "../actions/userActions";
+import { cleearerrormessage, signup } from "../actions/userActions";
 import cookie from "react-cookies";
 
 //Define a Signup Page Component
@@ -9,38 +9,32 @@ export default function SignUpPage(props) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const counter = useSelector((state) => state.userSignin.error);
+  const error = useSelector((state) => state.error);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const dispatch = useDispatch();
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
     setName(e.target.value);
-    setMessage("");
+    dispatch(cleearerrormessage());
   };
   //email change handler to update state variable with the text entered by the user
   const emailChangeHandler = (e) => {
     setEmail(e.target.value);
-    setMessage("");
+    dispatch(cleearerrormessage());
   };
   //password change handler to update state variable with the text entered by the user
   const passwordChangeHandler = (e) => {
     setPassword(e.target.value);
-    setMessage("");
+    dispatch(cleearerrormessage());
   };
 
   //submit Login handler to send a request to the node backend
   const submitSignUp = async (e) => {
-    await setMessage("");
-    dispatch(signup(name, email, password)).then((response) => {
-      console.log(counter);
-      if (response !== "") {
-        setMessage(counter);
-      }
-    });
+    dispatch(signup(name, email, password));
   };
 
-  return cookie.load("cookie") ? (
+  return isLoggedIn ? (
     <Navigate to="/home" />
   ) : (
     <div>
@@ -87,8 +81,8 @@ export default function SignUpPage(props) {
               </button>
             </div>
             <br></br>
-            <div class={message ? "visible" : "invisible"}>
-              <div class="alert alert-danger">{message}</div>
+            <div class={error ? "visible" : "invisible"}>
+              <div class="alert alert-danger">{error}</div>
             </div>
           </div>
         </div>

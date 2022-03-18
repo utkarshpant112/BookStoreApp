@@ -14,15 +14,21 @@ import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { logout, signin, signout } from "../actions/userActions";
 import { connect } from "react-redux";
+import axios from "axios";
+import { setproductaction } from "../actions/productactions";
 
 function EtsyNavbar(props) {
-  const [isLoggedIn, setisLoggedIn] = useState("");
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const userInfo = useSelector((state) => state.userInfo);
   const dispatch = useDispatch();
 
   //handle logout to destroy the cookie
   const handleLogout = (e) => {
     console.log("Inside logout");
     dispatch(logout());
+    axios.get("http://localhost:3001/api/products").then((response) => {
+      dispatch(setproductaction(response.data));
+    });
     cookie.remove("cookie", { path: "/" });
   };
 
@@ -35,7 +41,7 @@ function EtsyNavbar(props) {
           </LinkContainer>
           <SearchBox></SearchBox>
           <Nav className="me-auto">
-            {!cookie.load("cookie") ? (
+            {!isLoggedIn ? (
               <LoginModal
                 buttonName={"Favourites"}
                 redirectTo={"/favorites"}
@@ -47,19 +53,26 @@ function EtsyNavbar(props) {
             )}
           </Nav>
           <Nav className="me-auto">
-            {!cookie.load("cookie") ? (
+            {!isLoggedIn ? (
               <LoginModal
                 buttonName={"Sell"}
                 redirectTo={"/createshop"}
               ></LoginModal>
-            ) : (
+            ) : userInfo[0].shopname === null ? (
               <Link to="/createshop" className="nav-link">
+                Sell
+              </Link>
+            ) : (
+              <Link
+                to={"/shoppage/" + userInfo[0].shopname}
+                className="nav-link"
+              >
                 Sell
               </Link>
             )}
           </Nav>
           <Nav className="me-auto">
-            {!cookie.load("cookie") ? (
+            {!isLoggedIn ? (
               <LoginModal
                 buttonName={"My Purchases"}
                 redirectTo={"/mypurchases"}
@@ -71,7 +84,7 @@ function EtsyNavbar(props) {
             )}
           </Nav>
           <Nav className="me-auto">
-            {!cookie.load("cookie") ? (
+            {!isLoggedIn ? (
               <LoginModal
                 buttonName={"Profile"}
                 redirectTo={"/profile"}
@@ -87,7 +100,7 @@ function EtsyNavbar(props) {
               Cart
             </Link>
           </Nav>
-          {cookie.load("cookie") ? (
+          {isLoggedIn ? (
             <ul class="nav navbar-nav navbar-right">
               <li>
                 <Link to="/" onClick={handleLogout} className="nav-link">
@@ -108,10 +121,4 @@ function EtsyNavbar(props) {
   );
 }
 
-const mapStateToProps = (state) => {
-  return {
-    user: state.userSignin.userInfo,
-  };
-};
-
-export default connect(mapStateToProps)(EtsyNavbar);
+export default EtsyNavbar;

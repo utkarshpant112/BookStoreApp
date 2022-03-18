@@ -6,13 +6,15 @@ import Modal from "react-bootstrap/Modal";
 import { storage_bucket } from "./firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Select from "react-select";
+import { useDispatch } from "react-redux";
+import { shopPageProductsUpdated } from "../actions/productactions";
+import { useNavigate } from "react-router";
 
 export default function EditModal(props) {
   const { shopname } = props;
   const [show, setShow] = useState(false);
   const handleClose = () => {
-    props.setMounted(false);
-    props.onCloseModal();
+    navigate("/shoppage/" + shopname);
     setShow(false);
   };
   const handleShow = () => setShow(true);
@@ -28,8 +30,11 @@ export default function EditModal(props) {
     props.products.map((product) => product.name)
   );
   const [mounted, setMounted] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
+    dispatch(shopPageProductsUpdated(false));
     axios.get("http://localhost:3001/products/" + shopname).then((response) => {
       //update the state with the response data
       const abc = [];
@@ -112,6 +117,7 @@ export default function EditModal(props) {
       console.log("Status Code : ", response.status);
       if (response.status === 200 && response.data === "Product Updated") {
         setMessage("Product has been updated");
+        dispatch(shopPageProductsUpdated(true));
       } else {
         setMessage("Product not update");
       }

@@ -17,8 +17,17 @@ import MuPurchasesPage from "./pages/MyPurchasesPage";
 import LoginModal from "./components/LoginModal";
 import FavoritesPage from "./pages/FavoritesPage";
 import SearchPage from "./pages/SearchPage";
+import Dropdown from "react-bootstrap/Dropdown";
+import { useDispatch } from "react-redux";
+import { currencychange } from "./actions/currencyAction";
 
 function App() {
+  const currencyupdate = (e) => {
+    console.log(e);
+    dispatch(currencychange(e));
+  };
+  const dispatch = useDispatch();
+
   return (
     <BrowserRouter>
       <div className="d-flex flex-column site-container">
@@ -43,7 +52,24 @@ function App() {
           </Container>
         </main>
         <footer>
-          <div className="page-footer">All rights reserved</div>
+          <div className="page-footer">
+            <Dropdown
+              style={{ position: "absolute", left: "10px", top: "0px" }}
+              onSelect={currencyupdate}
+            >
+              {" "}
+              <Dropdown.Toggle variant="success" id="dropdown-basic">
+                Currency
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="$">USD($)</Dropdown.Item>
+                <Dropdown.Item eventKey="£">GBP(£)</Dropdown.Item>
+                <Dropdown.Item eventKey="€">EURO(€)</Dropdown.Item>
+                <Dropdown.Item eventKey="₹">INR(₹)</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+            All rights reserved
+          </div>
         </footer>
       </div>
     </BrowserRouter>

@@ -1,6 +1,5 @@
 import axios from "axios";
-import cookie, { setRawCookie } from "react-cookies";
-import { createBrowserHistory } from "history";
+import cookie from "react-cookies";
 
 import {
   USER_LOGIN_FAIL,
@@ -9,7 +8,8 @@ import {
   USER_LOGOUT,
   USER_SIGNUP_REQUEST,
   USER_SIGNUP_SUCCESS,
-  USER_SIGNUP_FAIL,
+  CLEAR_ERROR_MESSAGE,
+  UPDATE_USER_INFO,
 } from "../constants/userConstants";
 
 export const login = (email, password) => async (dispatch) => {
@@ -29,6 +29,7 @@ export const login = (email, password) => async (dispatch) => {
       if (response.status === 200) {
         localStorage.setItem("email", email);
         localStorage.setItem("shopname", response.data[0].shopname);
+        console.log(response.data);
         dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
       }
       return "";
@@ -74,4 +75,13 @@ export const logout = (email, password) => async (dispatch) => {
   localStorage.removeItem("shopname");
   localStorage.removeItem("cartItems");
   dispatch({ type: USER_LOGOUT });
+};
+
+export const cleearerrormessage = () => async (dispatch) => {
+  dispatch({ type: CLEAR_ERROR_MESSAGE });
+};
+
+export const updateUserInfo = (data) => async (dispatch) => {
+  console.log(data);
+  dispatch({ type: UPDATE_USER_INFO, payload: { data } });
 };

@@ -141,6 +141,7 @@ class CreateShopPage extends Component {
                     </Button>
                   </div>
                 </div>
+                <br></br>
                 <div class={this.state.message ? "visible" : "invisible"}>
                   <div class="alert alert-primary">{this.state.message}</div>
                 </div>

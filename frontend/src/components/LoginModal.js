@@ -3,51 +3,46 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { login } from "../actions/userActions";
+import { cleearerrormessage, login } from "../actions/userActions";
 import { Navigate } from "react-router";
 import cookie from "react-cookies";
+import { Formik, Field, Form } from "formik";
 
 export default function LoginModal(props) {
   const [show, setShow] = useState(props.show);
   const handleShow = () => setShow(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errormessage, seterrorMessage] = useState("");
-  const counter = useSelector((state) => state.userSignin.error);
+  const error = useSelector((state) => state.error);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
 
   const dispatch = useDispatch();
 
   //email change handler to update state variable with the text entered by the user
   const emailChangeHandler = (e) => {
     setEmail(e.target.value);
-    //remove error message if any
-    seterrorMessage("");
+    dispatch(cleearerrormessage());
   };
 
   //password change handler to update state variable with the text entered by the user
   const passwordChangeHandler = (e) => {
     setPassword(e.target.value);
-    //remove error message if any
-    seterrorMessage("");
+    dispatch(cleearerrormessage());
   };
 
   //Closing the modal
   const handleClose = () => {
-    seterrorMessage("");
+    dispatch(cleearerrormessage());
     setShow(false);
   };
 
   //submit Login handler to send a request to the node backend
   const submitLogin = async (e) => {
-    await seterrorMessage("");
-    dispatch(login(email, password)).then((response) => {
-      if (response !== "") {
-        seterrorMessage(counter);
-      }
-    });
+    dispatch(cleearerrormessage());
+    dispatch(login(email, password)).then((response) => {});
   };
 
-  return cookie.load("cookie") ? (
+  return isLoggedIn ? (
     <Navigate to={props.redirectTo} state={"loggedin"} />
   ) : (
     <>
@@ -72,6 +67,36 @@ export default function LoginModal(props) {
                     <p>Please enter your username and password</p>
                   </div>
 
+                  {/* <Formik
+                    initialValues={{ email: "", epassword: "" }}
+                    onSubmit={async (values) => {
+                      await new Promise((resolve) => setTimeout(resolve, 500));
+                      alert(JSON.stringify(values, null, 2));
+                    }}
+                  >
+                    <Form>
+                      <Field
+                        onChange={emailChangeHandler}
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        placeholder="Email Address"
+                      />
+                      <br></br>
+                      <Field
+                        onChange={passwordChangeHandler}
+                        type="password"
+                        class="form-control"
+                        name="password"
+                        placeholder="Password"
+                      />
+                      <br></br>
+                      <Button variant="success" onClick={submitLogin}>
+                        Login
+                      </Button>
+                    </Form>
+                  </Formik> */}
+                  <br></br>
                   <div class="form-group" style={{ width: "70%" }}>
                     <input
                       onChange={emailChangeHandler}
@@ -98,8 +123,8 @@ export default function LoginModal(props) {
                     </Button>
                   </div>
                   <br></br>
-                  <div class={errormessage ? "visible" : "invisible"}>
-                    <div class="alert alert-danger">{errormessage}</div>
+                  <div class={error ? "visible" : "invisible"}>
+                    <div class="alert alert-danger">{error}</div>
                   </div>
                   <div className="mb-3">
                     New customer?{" "}

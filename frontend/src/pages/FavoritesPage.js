@@ -1,19 +1,11 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import cookie from "react-cookies";
-import { Navigate, useParams } from "react-router";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import CreateModal from "../Utilities/CreateModal";
-import EditModal from "../Utilities/EditModal";
+import { useParams } from "react-router";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/esm/Row";
 import Col from "react-bootstrap/esm/Col";
 import Product from "../components/Product";
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
-import { storage_bucket } from "../Utilities/firebase";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import SearchBox from "../components/Searchbox";
+import { Link } from "react-router-dom";
 
 //Define Shop Page Component
 const FavoritesPage = () => {
@@ -25,16 +17,14 @@ const FavoritesPage = () => {
   const [refresh, setRefresh] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredproducts, setfilteredProducts] = useState([]);
-  const [searchField, setSearchField] = useState("");
 
   const handleChange = (e) => {
     let currentList = [];
     let newList = [];
-    setSearchField(e.target.value);
-    if (searchField !== "") {
+    if (e.target.value !== "") {
       currentList = products;
       newList = currentList.filter((product) =>
-        product.name.toLowerCase().includes(searchField.toLowerCase())
+        product.name.toLowerCase().includes(e.target.value.toLowerCase())
       );
     } else {
       newList = products;
@@ -54,7 +44,7 @@ const FavoritesPage = () => {
     axios
       .get("http://localhost:3001/userprofile/" + useremail)
       .then((response) => {
-        setUser(response.data);
+        setUser(response.data[0]);
       });
     axios
       .get("http://localhost:3001/getfavoriteproducts/" + useremail)

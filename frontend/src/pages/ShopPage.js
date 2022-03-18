@@ -9,6 +9,7 @@ import Col from "react-bootstrap/esm/Col";
 import Product from "../components/Product";
 import { storage_bucket } from "../Utilities/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useSelector } from "react-redux";
 
 //Define Shop Page Component
 const ShopPage = (props) => {
@@ -19,14 +20,16 @@ const ShopPage = (props) => {
   const [message, setMessage] = useState("");
   const [salescount, setsalescount] = useState("");
   const [products, setProducts] = useState([]);
+  const shopPageProductsUpdated = useSelector(
+    (state) => state.shopPageProductsUpdated
+  );
 
   const [mounted, setMounted] = useState(false);
 
-  function handleCloseModal() {
-    console.log("this was fired");
+  useEffect(() => {
     setMounted(true);
     setMounted(false);
-  }
+  }, [shopPageProductsUpdated]);
 
   useEffect(() => {
     console.log(shopname);
@@ -140,16 +143,10 @@ const ShopPage = (props) => {
               >
                 <Row>
                   <Col md={6}>
-                    <CreateModal
-                      setMounted={setMounted}
-                      onCloseModal={handleCloseModal}
-                      shopname={shopname}
-                    ></CreateModal>
+                    <CreateModal shopname={shopname}></CreateModal>
                   </Col>
                   <Col md={6}>
                     <EditModal
-                      setMounted={setMounted}
-                      onCloseModal={handleCloseModal}
                       shopname={shopname}
                       products={products}
                     ></EditModal>

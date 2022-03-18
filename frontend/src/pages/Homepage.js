@@ -4,58 +4,55 @@ import axios from "axios";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
+import { setproductaction } from "../actions/productactions";
 
 function HomePage(props) {
-  const [products, setproducts] = useState([]);
+  // const [products, setproducts] = useState([]);
   const [mounted, setMounted] = useState(false);
-  const userInfo = useSelector((state) => state.userSignin.userInfo);
-  const { state } = useLocation();
+  const userInfo = useSelector((state) => state.userInfo);
+  const products = useSelector((state) => state.products);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (state != null) {
-      const { data } = state;
-      console.log(data);
-    }
-    if (localStorage.getItem("email") !== null) {
-      console.log(localStorage.getItem("email"));
+    if (userInfo !== null) {
+      console.log(userInfo[0].email);
       axios
-        .get(
-          "http://localhost:3001/othersellerproducts/" +
-            localStorage.getItem("email")
-        )
+        .get("http://localhost:3001/othersellerproducts/" + userInfo[0].email)
         .then((response) => {
-          console.log(response.data);
-          //update the state with the response data
-          setproducts(products.concat(response.data));
+          dispatch(setproductaction(response.data));
         });
     } else {
       axios.get("http://localhost:3001/api/products").then((response) => {
-        //update the state with the response data
-        setproducts(products.concat(response.data));
+        dispatch(setproductaction(response.data));
       });
     }
     setMounted(true);
-  }, []);
+  }, [isLoggedIn]);
 
   return (
     <div>
       <Helmet>
         <title>Etsy</title>
       </Helmet>
-      {userInfo === "" ? (
-        <h1>Welcome back</h1>
+      {userInfo !== null ? (
+        <h1>Welcome back {userInfo[0].name}</h1>
       ) : (
         <h1>Find something you love</h1>
       )}
       <div className="products">
         <Row>
-          {products.map((product) => (
-            <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
-              <Product product={product}></Product>
-            </Col>
-          ))}
+          {products !== null ? (
+            products.products.map((product) => (
+              <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
+                <Product product={product}></Product>
+              </Col>
+            ))
+          ) : (
+            <div></div>
+          )}
         </Row>
       </div>
     </div>

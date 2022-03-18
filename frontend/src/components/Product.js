@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
 import Card from "react-bootstrap/Card";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import FavoriteModal from "./FavoriteModal";
 
 function Product(props) {
   const { product } = props;
+  const currency = useSelector((state) => state.currency.currency);
 
   return (
     <Card className="product-card">
@@ -22,7 +25,9 @@ function Product(props) {
           <Card.Title>{product.name}</Card.Title>
         </Link>
 
-        <Card.Text>$ {product.price}</Card.Text>
+        <Card.Text>
+          {currency} {product.price}
+        </Card.Text>
         {product.instock === 0 ? (
           <Card.Text>Out of stock ({product.totalsales} sold)</Card.Text>
         ) : (

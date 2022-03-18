@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, useEffect, useState } from "react";
 import axios from "axios";
 import cookie from "react-cookies";
 import { Navigate } from "react-router";
@@ -7,111 +7,90 @@ import Card from "react-bootstrap/Card";
 import countryList from "react-select-country-list";
 import { storage_bucket } from "../Utilities/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { useDispatch, useSelector } from "react-redux";
+import { updateUserInfo } from "../actions/userActions";
 
 //Define a Profile Page Component
-class ProfilePage extends Component {
-  //call the constructor method
-  constructor(props) {
-    //Call the constrictor of Super class i.e The Component
-    super(props);
+function ProfilePage(props) {
+  const [name, setName] = useState("");
+  const [city, setCity] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [country, setCountry] = useState("");
+  const [about, setAbout] = useState("");
+  const [image, setImage] = useState("");
+  const [message, setMessage] = useState("");
+  const [password, setPassword] = useState("");
+  const [id, setId] = useState("");
+  const [options, setOptions] = useState(countryList().getData());
+  const [dob, setDob] = useState("");
+  const userInfo = useSelector((state) => state.userInfo);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const dispatch = useDispatch();
 
-    this.state = {
-      name: "",
-      dob: "",
-      city: "",
-      email: "",
-      phone: "",
-      address: "",
-      country: "",
-      about: "",
-      image: "",
-      message: undefined,
-      options: countryList().getData(),
-    };
-    //Bind the handlers to this class
-    this.nameChangeHandler = this.nameChangeHandler.bind(this);
-    this.dobChangeHandler = this.dobChangeHandler.bind(this);
-    this.cityChangeHandler = this.cityChangeHandler.bind(this);
-    this.emailChangeHandler = this.emailChangeHandler.bind(this);
-    this.phoneChangeHandler = this.phoneChangeHandler.bind(this);
-    this.addressChangeHandler = this.addressChangeHandler.bind(this);
-    this.countryChangeHandler = this.countryChangeHandler.bind(this);
-    this.aboutChangeHandler = this.aboutChangeHandler.bind(this);
-    this.aboutChangeHandler = this.aboutChangeHandler.bind(this);
-    this.onImageChange = this.onImageChange.bind(this);
-    this.submitProfile = this.submitProfile.bind(this);
-  }
-
-  componentDidMount() {
+  useEffect(() => {
     let useremail = localStorage.getItem("email");
     axios
       .get("http://localhost:3001/userprofile/" + useremail)
       .then((response) => {
-        //update the state with the response data
-        this.setState({
-          name: response.data.name,
-          dob: response.data.dob,
-          city: response.data.city,
-          email: response.data.email,
-          phone: response.data.phone,
-          address: response.data.address,
-          country: response.data.country,
-          about: response.data.about,
-          image: response.data.pic,
-        });
+        setName(response.data[0].name);
+        setDob(response.data[0].dob);
+        setCity(response.data[0].city);
+        setEmail(response.data[0].email);
+        setPhone(response.data[0].phone);
+        setAddress(response.data[0].address);
+        setCountry(response.data[0].country);
+        setAbout(response.data[0].about);
+        setImage(response.data[0].pic);
+        setPassword(response.data[0].password);
+        setId(response.data[0].id);
       });
-  }
+  }, []);
 
   //name change handler to update state variable with the text entered by the user
-  nameChangeHandler = (e) => {
-    this.setState({
-      name: e.target.value,
-    });
+  const nameChangeHandler = (e) => {
+    setName(e.target.value);
+    setMessage("");
   };
   //dob change handler to update state variable with the text entered by the user
-  dobChangeHandler = (e) => {
-    this.setState({
-      dob: e.target.value,
-    });
+  const dobChangeHandler = (e) => {
+    setDob(e.target.value);
+    setMessage("");
   };
   //city change handler to update state variable with the text entered by the user
-  cityChangeHandler = (e) => {
-    this.setState({
-      city: e.target.value,
-    });
+  const cityChangeHandler = (e) => {
+    setCity(e.target.value);
+    setMessage("");
   };
   //email change handler to update state variable with the text entered by the user
-  emailChangeHandler = (e) => {
-    this.setState({
-      email: e.target.value,
-    });
+  const emailChangeHandler = (e) => {
+    setEmail(e.target.value);
+    setMessage("");
   };
   //phone change handler to update state variable with the text entered by the user
-  phoneChangeHandler = (e) => {
-    this.setState({
-      phone: e.target.value,
-    });
+  const phoneChangeHandler = (e) => {
+    setPhone(e.target.value);
+    setMessage("");
   };
   //address change handler to update state variable with the text entered by the user
-  addressChangeHandler = (e) => {
-    this.setState({
-      address: e.target.value,
-    });
+  const addressChangeHandler = (e) => {
+    setAddress(e.target.value);
+    setMessage("");
   };
   //country change handler to update state variable with the text entered by the user
-  countryChangeHandler = (e) => {
-    this.setState({
-      country: e.label,
-    });
+  const countryChangeHandler = (e) => {
+    setCountry(e.label);
+    setMessage("");
   };
   //about change handler to update state variable with the text entered by the user
-  aboutChangeHandler = (e) => {
-    this.setState({
-      about: e.target.value,
-    });
+  const aboutChangeHandler = (e) => {
+    setAbout(e.target.value);
+    setMessage("");
   };
   //image change handler to update state variable with the text entered by the user
-  onImageChange = (event) => {
+  const onImageChange = (event) => {
+    setMessage("");
     if (event.target.files && event.target.files[0]) {
       if (event.target.files[0] == null) return;
       const storageRef = ref(storage_bucket, event.target.files[0].name);
@@ -121,28 +100,28 @@ class ProfilePage extends Component {
         })
         .then((downloadURL) => {
           console.log("Download URL", downloadURL);
-          this.setState({
-            image: downloadURL,
-          });
+          setImage(downloadURL);
         });
     }
   };
 
   //submit Login handler to send a request to the node backend
-  submitProfile = (e) => {
+  const submitProfile = (e) => {
     //prevent page from refresh
     e.preventDefault();
     const data = {
-      name: this.state.name,
-      dob: this.state.dob,
-      city: this.state.city,
-      phone: this.state.phone,
-      currentemail: localStorage.getItem("email"),
-      email: this.state.email,
-      address: this.state.address,
-      country: this.state.country,
-      about: this.state.about,
-      image: this.state.image,
+      id: id,
+      name: name,
+      dob: dob,
+      city: city,
+      phone: phone,
+      currentemail: userInfo[0].email,
+      email: email,
+      address: address,
+      country: country,
+      about: about,
+      image: image,
+      password: password,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
@@ -152,158 +131,147 @@ class ProfilePage extends Component {
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {
-          localStorage.setItem("email", this.state.email);
-          this.setState({
-            message: response.data,
-          });
+          setMessage(response.data);
+          axios
+            .get("http://localhost:3001/userprofile/" + userInfo[0].email)
+            .then((response) => {
+              dispatch(updateUserInfo(response.data));
+            });
         }
       })
       .catch((error) => {
         console.log(error.response.data);
-        this.setState({
-          message: error.response.data,
-        });
+        setMessage(error.response.data);
       });
   };
 
-  render() {
-    //redirect based on successful login
-    let redirectVar = null;
-    if (!cookie.load("cookie")) {
-      redirectVar = <Navigate to="/" />;
-    }
-    return (
-      <div>
-        {redirectVar}
-        <div class="container">
-          <div class="profile-form">
-            <div class="main-div">
-              <div class="panel">
-                <h2>Your Public Profile</h2>
-                <p>Everything on this page can be seen by anyone</p>
-              </div>
-              <div style={{ width: "25.45%" }}>
-                <Card>
-                  <img
-                    src={
-                      this.state.image
-                        ? this.state.image
-                        : "https://firebasestorage.googleapis.com/v0/b/etsy-lab1.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=7127f000-8f23-447d-8587-e7a803ee957e"
-                    }
-                    className="card-img-top"
-                    alt="description of image"
-                  />
-                  <h6>Profile Image</h6>
-                  <input
-                    type="file"
-                    name="myImage"
-                    onChange={this.onImageChange}
-                  />
-                </Card>
-              </div>
-              <div></div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.nameChangeHandler}
-                  type="text"
-                  class="form-control"
-                  name="name"
-                  value={this.state.name}
-                  placeholder="Name"
+  return !isLoggedIn ? (
+    <Navigate to="/" />
+  ) : (
+    <div>
+      <div class="container">
+        <div class="profile-form">
+          <div class="main-div">
+            <div class="panel">
+              <h2>Your Public Profile</h2>
+              <p>Everything on this page can be seen by anyone</p>
+            </div>
+            <div style={{ width: "25.45%" }}>
+              <Card>
+                <img
+                  src={
+                    image
+                      ? image
+                      : "https://firebasestorage.googleapis.com/v0/b/etsy-lab1.appspot.com/o/blank-profile-picture-973460_1280.png?alt=media&token=7127f000-8f23-447d-8587-e7a803ee957e"
+                  }
+                  className="card-img-top"
+                  alt="description of image"
                 />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.dobChangeHandler}
-                  type="date"
-                  class="form-control"
-                  name="dateofbirth"
-                  value={this.state.dob}
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.emailChangeHandler}
-                  type="email"
-                  class="form-control"
-                  name="email"
-                  value={this.state.email}
-                  placeholder="Email"
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.phoneChangeHandler}
-                  type="phone"
-                  class="form-control"
-                  name="phone"
-                  value={this.state.phone}
-                  placeholder="Phone No"
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.addressChangeHandler}
-                  type="text"
-                  class="form-control"
-                  name="address"
-                  value={this.state.address}
-                  placeholder="Full Address"
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <input
-                  onChange={this.cityChangeHandler}
-                  type="text"
-                  class="form-control"
-                  value={this.state.city}
-                  name="city"
-                  placeholder="City"
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%" }}>
-                <Select
-                  onChange={this.countryChangeHandler}
-                  options={this.state.options}
-                  value={this.state.country}
-                  placeholder={this.state.country}
-                />
-              </div>
-              <br></br>
-              <div class="form-group" style={{ width: "40%", height: "300%" }}>
-                <input
-                  onChange={this.aboutChangeHandler}
-                  type="text"
-                  class="form-control"
-                  value={this.state.about}
-                  name="about"
-                  placeholder="About yourself"
-                />
-              </div>
-              <br></br>
-              <div>
-                <button onClick={this.submitProfile} class="btn btn-primary">
-                  Update Profile
-                </button>
-              </div>
-              <br></br>
-              <div class={this.state.message ? "visible" : "invisible"}>
-                <div class="alert alert-primary">{this.state.message}</div>
-              </div>
+                <h6>Profile Image</h6>
+                <input type="file" name="myImage" onChange={onImageChange} />
+              </Card>
+            </div>
+            <div></div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={nameChangeHandler}
+                type="text"
+                class="form-control"
+                name="name"
+                value={name}
+                placeholder="Name"
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={dobChangeHandler}
+                type="date"
+                class="form-control"
+                name="dateofbirth"
+                value={dob}
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={emailChangeHandler}
+                type="email"
+                class="form-control"
+                name="email"
+                value={email}
+                placeholder="Email"
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={phoneChangeHandler}
+                type="phone"
+                class="form-control"
+                name="phone"
+                value={phone}
+                placeholder="Phone No"
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={addressChangeHandler}
+                type="text"
+                class="form-control"
+                name="address"
+                value={address}
+                placeholder="Full Address"
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <input
+                onChange={cityChangeHandler}
+                type="text"
+                class="form-control"
+                value={city}
+                name="city"
+                placeholder="City"
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%" }}>
+              <Select
+                onChange={countryChangeHandler}
+                options={options}
+                value={country}
+                placeholder={country}
+              />
+            </div>
+            <br></br>
+            <div class="form-group" style={{ width: "40%", height: "300%" }}>
+              <input
+                onChange={aboutChangeHandler}
+                type="text"
+                class="form-control"
+                value={about}
+                name="about"
+                placeholder="About yourself"
+              />
+            </div>
+            <br></br>
+            <div>
+              <button onClick={submitProfile} class="btn btn-primary">
+                Update Profile
+              </button>
+            </div>
+            <br></br>
+            <div class={message ? "visible" : "invisible"}>
+              <div class="alert alert-primary">{message}</div>
             </div>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
-//export ProfilePage Component
 export default ProfilePage;

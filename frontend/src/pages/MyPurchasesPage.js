@@ -81,7 +81,9 @@ class MuPurchasesPage extends Component {
                       <span>{order.quantity}</span>{" "}
                     </Col>
                     <Col md={2}>
-                      <span>{order.price}</span>{" "}
+                      <span>
+                        {order.currency} {order.price}
+                      </span>{" "}
                     </Col>
                     <Col md={2}>
                       <span>{order.dateofpurchase}</span>{" "}

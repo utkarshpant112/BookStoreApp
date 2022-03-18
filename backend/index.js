@@ -171,7 +171,7 @@ app.get("/userprofile/:email", function (req, res) {
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result[0]));
+      res.end(JSON.stringify(result));
     }
   );
 });
@@ -505,7 +505,7 @@ app.get("/productdetails/:name", function (req, res) {
 app.post("/createorder", function (req, res) {
   console.log("Inside create order");
   con.query(
-    "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail) values ('" +
+    "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
       req.body.image +
       "','" +
       req.body.name +
@@ -519,6 +519,8 @@ app.post("/createorder", function (req, res) {
       req.body.date +
       "','" +
       req.body.email +
+      "','" +
+      req.body.currency +
       "')",
     function (err, result) {
       if (err) {
@@ -672,9 +674,17 @@ app.get("/othersellerproducts/:email", function (req, res) {
         console.log(err);
         return;
       }
-      console.log(result[0].shopname);
+      let shopname;
+      console.log(result);
+      try {
+        shopname = result[0].shopname;
+      } catch {
+        shopname = "";
+      }
+
+      console.log(shopname);
       con.query(
-        "Select * from products where shopname!='" + result[0].shopname + "'",
+        "Select * from products where shopname!='" + shopname + "'",
         function (err, result) {
           if (err) {
             console.log(err);
