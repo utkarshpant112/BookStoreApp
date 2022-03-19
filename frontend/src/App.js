@@ -54,7 +54,7 @@ function App() {
         <footer>
           <div className="page-footer">
             <Dropdown
-              style={{ position: "absolute", left: "10px", top: "0px" }}
+              style={{ position: "absolute", left: "10px", bottom: "5px" }}
               onSelect={currencyupdate}
             >
               {" "}
@@ -68,7 +68,7 @@ function App() {
                 <Dropdown.Item eventKey="₹">INR(₹)</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            All rights reserved
+            @2022 All rights reserved.
           </div>
         </footer>
       </div>

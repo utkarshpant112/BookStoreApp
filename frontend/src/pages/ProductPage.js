@@ -45,6 +45,8 @@ function ProductPage(props) {
       setMessage("You must be logged in to add items to cart.");
     } else if (product.shopname === localStorage.getItem("shopname")) {
       setMessage("You cannot add your own item to your cart");
+    } else if (setaddToCartQuantity < 1) {
+      setMessage("Please enter a valid quantity.");
     } else if (localStorage.getItem("cartItems") != null) {
       var cartItems = JSON.parse(localStorage.getItem("cartItems"));
       const existItem = cartItems.find((x) => x.id === product.id);

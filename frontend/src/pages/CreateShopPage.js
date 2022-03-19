@@ -50,30 +50,40 @@ class CreateShopPage extends Component {
   }
 
   shopnameAvailable = (e) => {
-    //prevent page from refresh
-    e.preventDefault();
-    const data = {
-      shopname: this.state.shopname,
-    };
-    //set the with credentials to true
-    axios.defaults.withCredentials = true;
-    //make a post request with the user data
-    axios
-      .post("http://localhost:3001/shopNameAvailable", data)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200) {
-          this.setState({
-            message: response.data,
-          });
-        }
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-        this.setState({
-          message: error.response.data,
-        });
+    if (
+      this.state.shopname === "" ||
+      this.state.shopname === "null" ||
+      this.state.shopname === null
+    ) {
+      this.setState({
+        message: "Shop name cannnot be empty",
       });
+    } else {
+      //prevent page from refresh
+      e.preventDefault();
+      const data = {
+        shopname: this.state.shopname,
+      };
+      //set the with credentials to true
+      axios.defaults.withCredentials = true;
+      //make a post request with the user data
+      axios
+        .post("http://localhost:3001/shopNameAvailable", data)
+        .then((response) => {
+          console.log("Status Code : ", response.status);
+          if (response.status === 200) {
+            this.setState({
+              message: response.data,
+            });
+          }
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+          this.setState({
+            message: error.response.data,
+          });
+        });
+    }
   };
 
   //submit Shop Name to send a request to the node backend

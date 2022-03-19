@@ -33,9 +33,7 @@ export default function EditModal(props) {
   const [countInStock, setCountInStock] = useState("");
   const [message, setMessage] = useState("");
   const [option, setOptions] = useState("");
-  const [categoryoptions, setcategoryOptions] = useState(
-    props.products.map((product) => product.name)
-  );
+  const [categoryoptions, setcategoryOptions] = useState("");
   const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
