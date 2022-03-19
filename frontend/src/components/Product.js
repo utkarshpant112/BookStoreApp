@@ -3,28 +3,36 @@ import Card from "react-bootstrap/Card";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import FavoriteModal from "./FavoriteModal";
+import { useNavigate } from "react-router-dom";
 
 function Product(props) {
   const { product } = props;
   const currency = useSelector((state) => state.currency.currency);
+  const navigate = useNavigate();
 
+  const navigateToProductPage = () => {
+    navigate("/product/" + product.id);
+  };
   return (
     <Card className="product-card">
-      <Link to={`/product/${product.id}`}>
-        <img src={product.image} className="card-img-top" alt={product.name} />
+      <Link to={`/product/${product.id}`} classname="card-link">
+        <img src={product.image} className="card-img-top" alt={product.name} />{" "}
       </Link>
-      <FavoriteModal
-        name={product.name}
-        shopname={product.shopname}
-      ></FavoriteModal>
-      <Card.Body>
-        <Link
-          style={{ textDecoration: "none", color: "black" }}
-          to={`/product/${product.id}`}
-        >
-          <Card.Title>{product.name}</Card.Title>
-        </Link>
+      <div>
+        <FavoriteModal
+          name={product.name}
+          shopname={product.shopname}
+          class="rounded-circle-card"
+        ></FavoriteModal>
+      </div>
 
+      <Card.Body class="product-card-body">
+        <Card.Title
+          class="product-card-text"
+          style={{ textDecoration: "none" }}
+        >
+          {product.name}
+        </Card.Title>
         <Card.Text>
           {currency} {product.price}
         </Card.Text>

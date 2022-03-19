@@ -5,6 +5,7 @@ var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+const bcrypt = require("bcryptjs");
 const multer = require("multer");
 app.set("view engine", "ejs");
 
@@ -31,6 +32,7 @@ app.use(bodyParser.json());
 app.use(express.static("./public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
+var hashedPassword;
 //Allow Access Control
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
@@ -73,6 +75,7 @@ con.connect(function (err) {
 app.post("/login", function (req, res) {
   console.log("Inside Login Post Request");
   console.log("Req Body : ", req.body);
+  let password = req.body.password;
   con.query(
     "SELECT * FROM users where email ='" + req.body.email + "'",
     function (err, result) {
@@ -81,80 +84,93 @@ app.post("/login", function (req, res) {
         return;
       }
       if (result.length > 0) {
-        if (
-          result[0].email === req.body.email &&
-          result[0].password === req.body.password
-        ) {
-          res.cookie("cookie", "admin", {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/",
+        if (result[0].email === req.body.email) {
+          bcrypt.compare(password, result[0].password, function (err, answer) {
+            if (answer) {
+              res.cookie("cookie", "admin", {
+                maxAge: 900000,
+                httpOnly: false,
+                path: "/",
+              });
+              req.session.user = result;
+              res.writeHead(200, {
+                "Content-Type": "text/plain",
+              });
+              delete result[0].password;
+              res.end(JSON.stringify(result));
+            } else {
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end("Incorrect Password");
+            }
           });
-          req.session.user = result;
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end(JSON.stringify(result));
         } else {
           res.writeHead(400, {
             "Content-Type": "text/plain",
           });
-          res.end("Incorrect Password");
+          res.end("Email is not registered with us");
         }
-      } else {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Email is not registered with us");
       }
     }
   );
 });
 
 //Route to handle Post Request Call
-app.post("/signup", function (req, res) {
+app.post("/signup", async function (req, res) {
   console.log("Inside Signup Post Request");
   console.log("Req Body : ", req.body);
-  con.query(
-    "INSERT INTO users (name, email, password) VALUES ('" +
-      req.body.name +
-      "','" +
-      req.body.email +
-      "','" +
-      req.body.password +
-      "')",
-    function (err, result) {
+  let password = req.body.password;
+  bcrypt.genSalt(10, function (err, Salt) {
+    // The bcrypt is used for encrypting password.
+    bcrypt.hash(password, Salt, function (err, hash) {
       if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          console.log(err);
-          res.writeHead(400, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Email is already registered with us");
-          return;
-        }
+        return console.log("Cannot encrypt");
       }
+      hashedPassword = hash;
       con.query(
-        "SELECT * FROM users where email ='" + req.body.email + "'",
+        "INSERT INTO users (name, email, password) VALUES ('" +
+          req.body.name +
+          "','" +
+          req.body.email +
+          "','" +
+          hashedPassword +
+          "')",
         function (err, result) {
           if (err) {
-            console.log(err);
-            return;
+            if (err.code === "ER_DUP_ENTRY") {
+              console.log(err);
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end("Email is already registered with us");
+              return;
+            }
           }
-          res.cookie("cookie", "admin", {
-            maxAge: 900000,
-            httpOnly: false,
-            path: "/",
-          });
-          req.session.user = result;
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end(JSON.stringify(result));
+          con.query(
+            "SELECT * FROM users where email ='" + req.body.email + "'",
+            function (err, result) {
+              if (err) {
+                console.log(err);
+                return;
+              }
+              res.cookie("cookie", "admin", {
+                maxAge: 900000,
+                httpOnly: false,
+                path: "/",
+              });
+              req.session.user = result;
+              res.writeHead(200, {
+                "Content-Type": "text/plain",
+              });
+              delete result[0].password;
+              res.end(JSON.stringify(result));
+            }
+          );
         }
       );
-    }
-  );
+    });
+  });
 });
 
 app.get("/userprofile/:email", function (req, res) {

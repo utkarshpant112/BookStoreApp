@@ -62,27 +62,16 @@ export default function FavoriteModal(props) {
 
   return (
     <>
-      <Button
-        class="btn bg-transparent"
+      <img
+        src="/images/heart.jpg"
+        class={props.class}
         onClick={favoritebuttonclick}
         style={{
-          position: "relative",
-          right: "-250px",
+          position: "sticky",
           height: "25px",
           width: "25px",
         }}
-      >
-        <img
-          src="/images/heart.jpg"
-          class="rounded-circle"
-          style={{
-            position: "relative",
-            right: "-250px",
-            height: "20px",
-            width: "20px",
-          }}
-        />
-      </Button>
+      />
 
       <Modal
         show={show}

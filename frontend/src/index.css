@@ -11,20 +11,6 @@ body {
   display: table;
 }
 
-/* header {
-  background-color: rgb(236, 228, 215);
-  padding: 0.5rem;
-}
-header a {
-  color: orangered;
-  font-weight: normal;
-  font-family: "Guardian-EgypTT", Charter, "Charter Bitstream", Cambria,
-    "Noto Serif Light", "Droid Serif", Georgia, serif;
-  font-size: xx-large;
-  font-stretch: expanded;
-  text-decoration: none;
-} */
-
 .logo {
   color: orangered;
   font-weight: normal;
@@ -72,10 +58,16 @@ main {
 
 .product-card {
   width: 275px;
-  height: 325px;
+  height: 300px;
   margin-left: 0;
 }
 
+.product-card.grid {
+  min-height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
 .product-info {
   padding: 2 rem;
   width: 300px;
@@ -135,4 +127,54 @@ body {
   display: block;
   position: relative;
   padding-bottom: 100px; /* height of your footer */
+}
+
+.rounded-circle-card:hover {
+  cursor: pointer;
+}
+.rounded-circle-card {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: -393px;
+  margin-left: 245px;
+}
+.rounded-circle-product-page:hover {
+  cursor: pointer;
+}
+.rounded-circle-product-page {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-top: -994px;
+  margin-left: 664px;
+}
+
+.product-card-text {
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1; /* number of lines to show */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.card-link {
+  position: relative;
+}
+
+.product-card-body {
+  margin-top: -21px;
+  margin-left: 8px;
+}
+
+.productpage-card-body {
+  margin-top: 0px;
+}
+
+.cartpage-card-body {
+  margin-top: 0px;
 }

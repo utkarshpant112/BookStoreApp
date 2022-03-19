@@ -109,6 +109,7 @@ function ProductPage(props) {
               <FavoriteModal
                 name={product.name}
                 shopname={product.shopname}
+                class="rounded-circle-product-page"
               ></FavoriteModal>
             </h3>
           </div>
@@ -125,8 +126,9 @@ function ProductPage(props) {
             <ListGroup.Item>Category: {product.category}</ListGroup.Item>
             <ListGroup.Item>Total Sold: {product.totalsales}</ListGroup.Item>
             <ListGroup.Item>Available: {product.instock}</ListGroup.Item>
+
             <Card>
-              <Card.Body>
+              <Card.Body class="productpage-card-body">
                 <ListGroup.Item>
                   <Row>
                     <Col>Seller:</Col>

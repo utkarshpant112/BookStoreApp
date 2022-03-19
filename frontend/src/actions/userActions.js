@@ -1,5 +1,6 @@
 import axios from "axios";
 import cookie from "react-cookies";
+import validator from "validator";
 
 import {
   USER_LOGIN_FAIL,
@@ -10,63 +11,81 @@ import {
   USER_SIGNUP_SUCCESS,
   CLEAR_ERROR_MESSAGE,
   UPDATE_USER_INFO,
+  USER_SIGNUP_FAIL,
 } from "../constants/userConstants";
 
 export const login = (email, password) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST, payload: { email, password } });
 
-  const data = {
-    email: email,
-    password: password,
-  };
-  console.log(email, password);
-  axios.defaults.withCredentials = true;
-  axios
-    .post("http://localhost:3001/login", data)
-    .then((response) => {
-      console.log("Status Code : ", response.status);
-      console.log("Status data : ", response.data);
-      if (response.status === 200) {
-        localStorage.setItem("email", email);
-        localStorage.setItem("shopname", response.data[0].shopname);
-        console.log(response.data);
-        dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
-      }
-      return "";
-    })
-    .catch((error) => {
-      console.log(error.response.data);
-      dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
-      return error.response.data;
-    });
+  if (!validator.isEmail(email)) {
+    dispatch({ type: USER_LOGIN_FAIL, payload: "Email is not valid" });
+  } else {
+    const data = {
+      email: email,
+      password: password,
+    };
+    console.log(email, password);
+    axios.defaults.withCredentials = true;
+    axios
+      .post("http://localhost:3001/login", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        console.log("Status data : ", response.data);
+        if (response.status === 200) {
+          localStorage.setItem("email", email);
+          localStorage.setItem("shopname", response.data[0].shopname);
+          console.log(response.data);
+          dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
+        }
+        return "";
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+        dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
+        return error.response.data;
+      });
+  }
 };
 
 export const signup = (name, email, password) => async (dispatch) => {
   dispatch({ type: USER_SIGNUP_REQUEST, payload: { name, email, password } });
-
-  const data = {
-    name: name,
-    email: email,
-    password: password,
-  };
-  console.log(name, email, password);
-  axios.defaults.withCredentials = true;
-
-  axios
-    .post("http://localhost:3001/signup", data)
-    .then((response) => {
-      console.log("Status Code : ", response.status);
-      if (response.status === 200) {
-        localStorage.setItem("email", email);
-        dispatch({ type: USER_SIGNUP_SUCCESS, payload: response.data });
-        return "";
-      }
-    })
-    .catch((error) => {
-      console.log(error.response.data);
-      dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
-      return error.response.data;
+  if (!validator.isEmail(email)) {
+    dispatch({ type: USER_SIGNUP_FAIL, payload: "Email entered is not valid" });
+  } else if (!validator.isStrongPassword(password)) {
+    dispatch({
+      type: USER_SIGNUP_FAIL,
+      payload: "Password entered is not strong enough",
     });
+  } else if (!validator.isAlpha(name, "en-US", { ignore: " " })) {
+    dispatch({
+      type: USER_SIGNUP_FAIL,
+      payload: "Name must have letters only",
+    });
+  } else {
+    const data = {
+      name: name,
+      email: email,
+      password: password,
+    };
+    console.log(name, email, password);
+    axios.defaults.withCredentials = true;
+
+    axios
+      .post("http://localhost:3001/signup", data)
+      .then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200) {
+          localStorage.setItem("email", email);
+          dispatch({ type: USER_SIGNUP_SUCCESS, payload: response.data });
+          return "";
+        }
+      })
+      .catch((error) => {
+        console.log(error.response.data);
+        dispatch({ type: USER_SIGNUP_FAIL, payload: error.response.data });
+        return error.response.data;
+      });
+  }
 };
 
 export const logout = (email, password) => async (dispatch) => {

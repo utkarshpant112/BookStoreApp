@@ -9,6 +9,7 @@ import Select from "react-select";
 import { useDispatch } from "react-redux";
 import { shopPageProductsUpdated } from "../actions/productactions";
 import { useNavigate } from "react-router";
+import validator from "validator";
 
 export default function EditModal(props) {
   const { shopname } = props;
@@ -110,29 +111,44 @@ export default function EditModal(props) {
 
   const updateProduct = (e) => {
     setMessage("");
-    //prevent page from refresh
-    e.preventDefault();
-    const data = {
-      name: name,
-      price: price,
-      image: image,
-      category: category,
-      description: description,
-      instock: countInStock,
-      shopname: shopname,
-    };
-    //set the with credentials to true
-    axios.defaults.withCredentials = true;
-    //make a post request with the user data
-    axios.post("http://localhost:3001/updateproduct", data).then((response) => {
-      console.log("Status Code : ", response.status);
-      if (response.status === 200 && response.data === "Product Updated") {
-        setMessage("Product has been updated");
-        dispatch(shopPageProductsUpdated(true));
-      } else {
-        setMessage("Product not update");
-      }
-    });
+    if (!validator.isAlphanumeric(name, "en-US", { ignore: " " })) {
+      setMessage("Name must have letters or numbers only.");
+    } else if (
+      !validator.isNumeric(price.toString()) ||
+      !validator.isDecimal(price.toString())
+    ) {
+      setMessage("Price can only have numbers");
+    } else if (!validator.isAlpha(category, "en-US", { ignore: " " })) {
+      setMessage("Category must have letters only.");
+    } else if (!validator.isNumeric(countInStock)) {
+      setMessage("Quantity can only be a number");
+    } else {
+      //prevent page from refresh
+      e.preventDefault();
+      const data = {
+        name: name,
+        price: price,
+        image: image,
+        category: category,
+        description: description,
+        instock: countInStock,
+        shopname: shopname,
+      };
+      //set the with credentials to true
+      axios.defaults.withCredentials = true;
+      //make a post request with the user data
+      axios
+        .post("http://localhost:3001/updateproduct", data)
+        .then((response) => {
+          console.log("Status Code : ", response.status);
+          if (response.status === 200 && response.data === "Product Updated") {
+            setMessage("Product has been updated");
+            dispatch(shopPageProductsUpdated(true));
+          } else {
+            setMessage("Product not update");
+          }
+        });
+    }
   };
 
   return !props.products ? null : (

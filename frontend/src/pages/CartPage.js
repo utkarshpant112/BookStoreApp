@@ -129,7 +129,7 @@ function CartPage(props) {
         </Col>
         <Col md={4}>
           <Card>
-            <Card.Body>
+            <Card.Body class="cartpage-card-body">
               <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h3>

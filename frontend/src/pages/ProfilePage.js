@@ -9,6 +9,7 @@ import { storage_bucket } from "../Utilities/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserInfo } from "../actions/userActions";
+import validator from "validator";
 
 //Define a Profile Page Component
 function ProfilePage(props) {
@@ -107,42 +108,52 @@ function ProfilePage(props) {
 
   //submit Login handler to send a request to the node backend
   const submitProfile = (e) => {
-    //prevent page from refresh
-    e.preventDefault();
-    const data = {
-      id: id,
-      name: name,
-      dob: dob,
-      city: city,
-      phone: phone,
-      currentemail: userInfo[0].email,
-      email: email,
-      address: address,
-      country: country,
-      about: about,
-      image: image,
-      password: password,
-    };
-    //set the with credentials to true
-    axios.defaults.withCredentials = true;
-    //make a post request with the user data
-    axios
-      .post("http://localhost:3001/updateprofile", data)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200) {
-          setMessage(response.data);
-          axios
-            .get("http://localhost:3001/userprofile/" + userInfo[0].email)
-            .then((response) => {
-              dispatch(updateUserInfo(response.data));
-            });
-        }
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-        setMessage(error.response.data);
-      });
+    if (!validator.isAlpha(name, "en-US", { ignore: " " })) {
+      setMessage("Name must have letters only.");
+    } else if (!validator.isAlpha(city, "en-US", { ignore: " " })) {
+      setMessage("City must have letters only.");
+    } else if (phone ? !validator.isMobilePhone(phone, "any") : false) {
+      setMessage("Your mobile number is not valid.");
+    } else if (!validator.isEmail(email)) {
+      setMessage("Email entered is not valid.");
+    } else {
+      //prevent page from refresh
+      e.preventDefault();
+      const data = {
+        id: id,
+        name: name,
+        dob: dob,
+        city: city,
+        phone: phone,
+        currentemail: userInfo[0].email,
+        email: email,
+        address: address,
+        country: country,
+        about: about,
+        image: image,
+        password: password,
+      };
+      //set the with credentials to true
+      axios.defaults.withCredentials = true;
+      //make a post request with the user data
+      axios
+        .post("http://localhost:3001/updateprofile", data)
+        .then((response) => {
+          console.log("Status Code : ", response.status);
+          if (response.status === 200) {
+            setMessage(response.data);
+            axios
+              .get("http://localhost:3001/userprofile/" + userInfo[0].email)
+              .then((response) => {
+                dispatch(updateUserInfo(response.data));
+              });
+          }
+        })
+        .catch((error) => {
+          console.log(error.response.data);
+          setMessage(error.response.data);
+        });
+    }
   };
 
   return !isLoggedIn ? (
@@ -190,6 +201,7 @@ function ProfilePage(props) {
                 type="date"
                 class="form-control"
                 name="dateofbirth"
+                max={"2015-01-01"}
                 value={dob}
               />
             </div>
