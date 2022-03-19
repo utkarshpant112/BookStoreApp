@@ -28,12 +28,14 @@ export default function CreateModal(props) {
   const handleShow = () => setShow(true);
   const [name, setName] = useState("");
   const [image, setImage] = useState(undefined);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState("Category of product");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [countInStock, setCountInStock] = useState("");
   const [options, setOptions] = useState("");
   const [message, setMessage] = useState("");
+  const [otherCategoryTexDisabled, setotherCategoryTextDisabled] =
+    useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -44,7 +46,16 @@ export default function CreateModal(props) {
   };
   //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
+    if (e.label === "Others") {
+      setotherCategoryTextDisabled(true);
+    }
     setCategory(e.label);
+
+    setMessage("");
+  };
+  //category change handler to update state variable with the text entered by the user
+  const othercategoryChangeHandler = (e) => {
+    setCategory(e.target.value);
     setMessage("");
   };
   //price change handler to update state variable with the text entered by the user
@@ -89,9 +100,7 @@ export default function CreateModal(props) {
   }, []);
 
   const addProduct = (e) => {
-    if (!validator.isAlphanumeric(name, "en-US", { ignore: " " })) {
-      setMessage("Name must have letters or numbers only.");
-    } else if (!validator.isNumeric(price) || !validator.isDecimal(price)) {
+    if (!validator.isNumeric(price) || !validator.isDecimal(price)) {
       setMessage("Price can only have numbers");
     } else if (!validator.isAlpha(category, "en-US", { ignore: " " })) {
       setMessage("Category must have letters only.");
@@ -119,6 +128,9 @@ export default function CreateModal(props) {
           if (response.status === 200 && response.data === "Product Added") {
             setMessage("Product has been added");
             dispatch(shopPageProductsUpdated(true));
+            setTimeout(() => {
+              handleClose();
+            }, 500);
           } else {
             setMessage("Product not added");
           }
@@ -134,7 +146,7 @@ export default function CreateModal(props) {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <Button variant="success" onClick={handleShow}>
         Add Product
       </Button>
 
@@ -204,6 +216,20 @@ export default function CreateModal(props) {
               placeholder={category}
               onChange={categoryChangeHandler}
             ></Select>
+          </div>
+          <br></br>
+          <div
+            class={otherCategoryTexDisabled ? "visible" : "invisible"}
+            style={{ width: "100%" }}
+          >
+            <input
+              onChange={othercategoryChangeHandler}
+              type="text"
+              class="form-control"
+              name="category"
+              value={category}
+              placeholder="Other Categories"
+            />
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>

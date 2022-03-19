@@ -36,6 +36,8 @@ export default function EditModal(props) {
   const [option, setOptions] = useState("");
   const [categoryoptions, setcategoryOptions] = useState("");
   const [mounted, setMounted] = useState(false);
+  const [otherCategoryTexDisabled, setotherCategoryTextDisabled] =
+    useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -65,7 +67,14 @@ export default function EditModal(props) {
       .then((response) => {
         //update the state with the response data
         setImage(response.data.image);
-        setCategory(response.data.category);
+        if (!categoryoptions.includes(response.data.category)) {
+          setotherCategoryTextDisabled(true);
+          setCategory("Others");
+          document.getElementById("other-category").value =
+            response.data.category;
+        } else {
+          setCategory(response.data.category);
+        }
         setDescription(response.data.description);
         setPrice(response.data.price);
         setCountInStock(response.data.instock);
@@ -90,7 +99,17 @@ export default function EditModal(props) {
   };
   //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
+    if (e.label === "Others") {
+      setotherCategoryTextDisabled(true);
+    }
     setCategory(e.label);
+
+    setMessage("");
+  };
+
+  //category change handler to update state variable with the text entered by the user
+  const othercategoryChangeHandler = (e) => {
+    setCategory(e.target.value);
     setMessage("");
   };
   //price change handler to update state variable with the text entered by the user
@@ -144,6 +163,9 @@ export default function EditModal(props) {
           if (response.status === 200 && response.data === "Product Updated") {
             setMessage("Product has been updated");
             dispatch(shopPageProductsUpdated(true));
+            setTimeout(() => {
+              handleClose();
+            }, 500);
           } else {
             setMessage("Product not update");
           }
@@ -153,7 +175,7 @@ export default function EditModal(props) {
 
   return !props.products ? null : (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <Button variant="success" onClick={handleShow}>
         Edit Product
       </Button>
 
@@ -221,6 +243,20 @@ export default function EditModal(props) {
               placeholder={category}
               onChange={categoryChangeHandler}
             ></Select>
+          </div>
+          <br></br>
+          <div
+            class={otherCategoryTexDisabled ? "visible" : "invisible"}
+            style={{ width: "100%" }}
+          >
+            <input
+              onChange={othercategoryChangeHandler}
+              type="text"
+              class="form-control"
+              name="other-category"
+              value={category}
+              placeholder="Other Categories"
+            />
           </div>
           <br></br>
           <div class="form-group" style={{ width: "100%" }}>
