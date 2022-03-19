@@ -1,6 +1,7 @@
 //import the require dependencies
 var express = require("express");
 var app = express();
+
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
@@ -58,7 +59,8 @@ var Users = [
 
 var mysql = require("mysql");
 
-var con = mysql.createConnection({
+var pool = mysql.createPool({
+  connectionLimit: 1000,
   host: "etsy.c5bcnawebmvb.us-east-2.rds.amazonaws.com",
   user: "admin",
   password: "apup%123",
@@ -66,54 +68,66 @@ var con = mysql.createConnection({
   database: "etsy",
 });
 
-con.connect(function (err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+// con.connect(function (err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 //Route to handle Post Request Call
 app.post("/login", function (req, res) {
   console.log("Inside Login Post Request");
   console.log("Req Body : ", req.body);
   let password = req.body.password;
-  con.query(
-    "SELECT * FROM users where email ='" + req.body.email + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (result.length > 0) {
-        if (result[0].email === req.body.email) {
-          bcrypt.compare(password, result[0].password, function (err, answer) {
-            if (answer) {
-              res.cookie("cookie", "admin", {
-                maxAge: 900000,
-                httpOnly: false,
-                path: "/",
-              });
-              req.session.user = result;
-              res.writeHead(200, {
-                "Content-Type": "text/plain",
-              });
-              delete result[0].password;
-              res.end(JSON.stringify(result));
-            } else {
-              res.writeHead(400, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Incorrect Password");
-            }
-          });
-        } else {
-          res.writeHead(400, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Email is not registered with us");
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "SELECT * FROM users where email ='" + req.body.email + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          if (result.length > 0) {
+            bcrypt.compare(
+              password,
+              result[0].password,
+              function (err, answer) {
+                if (answer) {
+                  res.cookie("cookie", "admin", {
+                    maxAge: 900000,
+                    httpOnly: false,
+                    path: "/",
+                  });
+                  req.session.user = result;
+                  res.writeHead(200, {
+                    "Content-Type": "text/plain",
+                  });
+                  delete result[0].password;
+                  delete result[0].userid;
+                  res.end(JSON.stringify(result));
+                } else {
+                  res.writeHead(401, {
+                    "Content-Type": "text/plain",
+                  });
+                  res.end("Incorrect Password");
+                }
+              }
+            );
+          } else {
+            res.writeHead(401, {
+              "Content-Type": "text/plain",
+            });
+            res.end("Email is not registered with us");
+          }
         }
-      }
+      );
     }
-  );
+  });
 });
 
 //Route to handle Post Request Call
@@ -128,47 +142,65 @@ app.post("/signup", async function (req, res) {
         return console.log("Cannot encrypt");
       }
       hashedPassword = hash;
-      con.query(
-        "INSERT INTO users (name, email, password) VALUES ('" +
-          req.body.name +
-          "','" +
-          req.body.email +
-          "','" +
-          hashedPassword +
-          "')",
-        function (err, result) {
-          if (err) {
-            if (err.code === "ER_DUP_ENTRY") {
-              console.log(err);
-              res.writeHead(400, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Email is already registered with us");
-              return;
-            }
-          }
+      pool.getConnection(function (err, con) {
+        if (err) {
+          res.writeHead(400, {
+            "Content-Type": "text/plain",
+          });
+          res.end(JSON.stringify(result));
+        } else {
           con.query(
-            "SELECT * FROM users where email ='" + req.body.email + "'",
+            "INSERT INTO users (name, email, password) VALUES ('" +
+              req.body.name +
+              "','" +
+              req.body.email +
+              "','" +
+              hashedPassword +
+              "')",
             function (err, result) {
               if (err) {
-                console.log(err);
-                return;
+                if (err.code === "ER_DUP_ENTRY") {
+                  console.log(err);
+                  res.writeHead(401, {
+                    "Content-Type": "text/plain",
+                  });
+                  res.end("Email is already registered with us");
+                  return;
+                }
               }
-              res.cookie("cookie", "admin", {
-                maxAge: 900000,
-                httpOnly: false,
-                path: "/",
+              pool.getConnection(function (err, con) {
+                if (err) {
+                  res.writeHead(400, {
+                    "Content-Type": "text/plain",
+                  });
+                  res.end(JSON.stringify(result));
+                } else {
+                  con.query(
+                    "SELECT * FROM users where email ='" + req.body.email + "'",
+                    function (err, result) {
+                      if (err) {
+                        console.log(err);
+                        return;
+                      }
+                      res.cookie("cookie", "admin", {
+                        maxAge: 900000,
+                        httpOnly: false,
+                        path: "/",
+                      });
+                      req.session.user = result;
+                      res.writeHead(200, {
+                        "Content-Type": "text/plain",
+                      });
+                      delete result[0].password;
+                      res.end(JSON.stringify(result));
+                    }
+                  );
+                }
               });
-              req.session.user = result;
-              res.writeHead(200, {
-                "Content-Type": "text/plain",
-              });
-              delete result[0].password;
-              res.end(JSON.stringify(result));
             }
           );
         }
-      );
+      });
     });
   });
 });
@@ -176,381 +208,282 @@ app.post("/signup", async function (req, res) {
 app.get("/userprofile/:email", function (req, res) {
   console.log("Inside profile get request");
   const email = req.params.email;
-  con.query(
-    "Select * from users where email='" + email + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      // req.session.user = result;
-      res.writeHead(200, {
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
         "Content-Type": "text/plain",
       });
       res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from users where email='" + email + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          // req.session.user = result;
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
     }
-  );
+  });
 });
 
 //Route to handle Post Request Call
 app.post("/updateprofile", function (req, res) {
   console.log("Inside Update Profile Post Request");
   console.log("Req Body : ", req.body);
-  con.query(
-    "UPDATE users SET name='" +
-      req.body.name +
-      "',email='" +
-      req.body.email +
-      "',city='" +
-      req.body.city +
-      "',phone='" +
-      req.body.phone +
-      "',address='" +
-      req.body.address +
-      "',country='" +
-      req.body.country +
-      "',dob='" +
-      req.body.dob +
-      "',about='" +
-      req.body.about +
-      "',pic='" +
-      req.body.image +
-      "' WHERE email='" +
-      req.body.currentemail +
-      "'",
-    function (err, result) {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          res.writeHead(400, {
-            "Content-Type": "text/plain",
-          });
-          res.end(
-            "Profile not updated as email is registered with another user."
-          );
-          return;
-        }
-      }
-      res.writeHead(200, {
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end("Profile updated");
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "UPDATE users SET name='" +
+          req.body.name +
+          "',email='" +
+          req.body.email +
+          "',city='" +
+          req.body.city +
+          "',phone='" +
+          req.body.phone +
+          "',address='" +
+          req.body.address +
+          "',country='" +
+          req.body.country +
+          "',dob='" +
+          req.body.dob +
+          "',about='" +
+          req.body.about +
+          "',pic='" +
+          req.body.image +
+          "' WHERE email='" +
+          req.body.currentemail +
+          "'",
+        function (err, result) {
+          if (err) {
+            if (err.code === "ER_DUP_ENTRY") {
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end(
+                "Profile not updated as email is registered with another user."
+              );
+              return;
+            }
+          }
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Profile updated");
+        }
+      );
     }
-  );
+  });
 });
 
 app.post("/shopNameAvailable", function (req, res) {
   console.log("Inside Shop name available");
-  con.query(
-    "Select * from shop where shopname='" + req.body.shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      // req.session.user = result;
 
-      console.log(result);
-      if (result < 1) {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop name is available.");
-      } else {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop name is not available.");
-      }
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from shop where shopname='" + req.body.shopname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          // req.session.user = result;
+
+          console.log(result);
+          if (result < 1) {
+            res.writeHead(200, {
+              "Content-Type": "text/plain",
+            });
+            res.end("Shop name is available.");
+          } else {
+            res.writeHead(400, {
+              "Content-Type": "text/plain",
+            });
+            res.end("Shop name is not available.");
+          }
+        }
+      );
     }
-  );
+  });
 });
 
 app.post("/isshopalreadycreated", function (req, res) {
   console.log("Inside isshopalreadycreated");
-  con.query(
-    "Select shopname from users where email='" + req.body.email + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      // req.session.user = result;
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select shopname from users where email='" + req.body.email + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          // req.session.user = result;
 
-      console.log(result[0].shopname);
-      if (result[0].shopname == null) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop hasn't been created yet");
-      } else {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end(result[0].shopname);
-      }
+          console.log(result[0].shopname);
+          if (result[0].shopname == "") {
+            res.writeHead(400, {
+              "Content-Type": "text/plain",
+            });
+            res.end("Shop hasn't been created yet");
+          } else {
+            res.writeHead(200, {
+              "Content-Type": "text/plain",
+            });
+            res.end(result[0].shopname);
+          }
+        }
+      );
     }
-  );
+  });
 });
 
 app.post("/createshop", function (req, res) {
   console.log("Inside Shop name available");
-  con.query(
-    "Insert into shop (shopname,email) values ('" +
-      req.body.shopname +
-      "','" +
-      req.body.email +
-      "')",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-    }
-  );
-  con.query(
-    "Update users SET shopname='" +
-      req.body.shopname +
-      "' where email='" +
-      req.body.email +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      res.writeHead(200, {
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end("Shop Created");
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Insert into shop (shopname,email) values ('" +
+          req.body.shopname +
+          "','" +
+          req.body.email +
+          "')",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+        }
+      );
     }
-  );
+  });
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Update users SET shopname='" +
+          req.body.shopname +
+          "' where email='" +
+          req.body.email +
+          "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Shop Created");
+        }
+      );
+    }
+  });
 });
 
 app.post("/addproduct", function (req, res) {
   console.log("Inside add product");
-  con.query(
-    "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
-      req.body.name +
-      "','" +
-      req.body.price +
-      "','" +
-      req.body.description +
-      "','" +
-      req.body.category +
-      "','" +
-      req.body.instock +
-      "','" +
-      req.body.image +
-      "','" +
-      req.body.shopname +
-      "')",
-    function (err, result) {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
+          req.body.name +
+          "','" +
+          req.body.price +
+          "','" +
+          req.body.description +
+          "','" +
+          req.body.category +
+          "','" +
+          req.body.instock +
+          "','" +
+          req.body.image +
+          "','" +
+          req.body.shopname +
+          "')",
+        function (err, result) {
+          if (err) {
+            if (err.code === "ER_DUP_ENTRY") {
+              res.writeHead(200, {
+                "Content-Type": "text/plain",
+              });
+              res.end("Product with same name exists");
+            }
+            console.log(err);
+            return;
+          }
           res.writeHead(200, {
             "Content-Type": "text/plain",
           });
-          res.end("Product with same name exists");
+          res.end("Product Added");
         }
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Product Added");
+      );
     }
-  );
+  });
 });
 
 app.post("/updateproduct", function (req, res) {
   console.log("Inside update product");
-  con.query(
-    "Update products set price='" +
-      req.body.price +
-      "',description='" +
-      req.body.description +
-      "',category='" +
-      req.body.category +
-      "',instock='" +
-      req.body.instock +
-      "',image='" +
-      req.body.image +
-      "' where name='" +
-      req.body.name +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
         "Content-Type": "text/plain",
-      });
-      res.end("Product Updated");
-    }
-  );
-});
-
-//Route to get All Products when user visits the Home Page
-app.get("/api/products", function (req, res) {
-  console.log("Inside Products");
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(result));
-  });
-});
-
-app.get("/api/products/id/:id", function (req, res) {
-  console.log("Inside Products");
-  const id = req.params.id;
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    const product = result.find((x) => x.id === parseInt(id));
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(product));
-  });
-});
-
-app.get("/ownerdetails/:shopname", function (req, res) {
-  console.log("Inside owner details");
-  const shopname = req.params.shopname;
-  con.query(
-    "Select * from users where shopname ='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-//Route to get All Products when user visits the Home Page
-app.get("/products/:shopname", function (req, res) {
-  console.log("Inside Shopname products");
-  const shopname = req.params.shopname;
-  con.query(
-    "Select * from products where shopname='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
       });
       res.end(JSON.stringify(result));
-    }
-  );
-});
-
-//Route to handle Post Request Call
-app.post("/addshopimage", function (req, res) {
-  console.log("Inside Update Profile Post Request");
-  console.log("Req Body : ", req.body);
-  con.query(
-    "UPDATE shop SET shopimage='" + req.body.shopImage + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Shop Image added");
-    }
-  );
-});
-
-//Route to get All Products when user visits the Home Page
-app.get("/shopimage/:shopname", function (req, res) {
-  console.log("Inside Shopname products");
-  const shopname = req.params.shopname;
-  con.query(
-    "Select shopimage from shop where shopname='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-//Route to get All Products when user visits the Home Page
-app.get("/productdetails/:name", function (req, res) {
-  console.log("Inside Shopname products");
-  const productname = req.params.name;
-  con.query(
-    "Select * from products where name='" + productname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-app.post("/createorder", function (req, res) {
-  console.log("Inside create order");
-  con.query(
-    "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
-      req.body.image +
-      "','" +
-      req.body.name +
-      "','" +
-      req.body.shopname +
-      "'," +
-      req.body.quantity +
-      "," +
-      req.body.price +
-      ",'" +
-      req.body.date +
-      "','" +
-      req.body.email +
-      "','" +
-      req.body.currency +
-      "')",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
+    } else {
       con.query(
-        "UPDATE products SET instock= instock-" +
-          req.body.quantity +
-          ",totalsales= totalsales+" +
-          req.body.quantity +
-          " where shopname='" +
-          req.body.shopname +
-          "' and name='" +
+        "Update products set price='" +
+          req.body.price +
+          "',description='" +
+          req.body.description +
+          "',category='" +
+          req.body.category +
+          "',instock='" +
+          req.body.instock +
+          "',image='" +
+          req.body.image +
+          "' where name='" +
           req.body.name +
           "'",
         function (err, result) {
@@ -561,45 +494,24 @@ app.post("/createorder", function (req, res) {
           res.writeHead(200, {
             "Content-Type": "text/plain",
           });
-          res.end("Order Creted");
+          res.end("Product Updated");
         }
       );
     }
-  );
+  });
 });
 
 //Route to get All Products when user visits the Home Page
-app.get("/orders/:email", function (req, res) {
-  console.log("Inside orders");
-  const email = req.params.email;
-  con.query(
-    "Select * from orders where customeremail='" +
-      email +
-      "' order by dateofpurchase asc",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
+app.get("/api/products", function (req, res) {
+  console.log("Inside Products");
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
       });
       res.end(JSON.stringify(result));
-    }
-  );
-});
-
-app.get("/search", function (req, res) {
-  console.log("Inside Products 1");
-  console.log(req.query.name);
-  if (req.query.email === "") {
-    con.query(
-      "Select * from products where name like '%" +
-        req.query.name +
-        "%' or category like '%" +
-        req.query.name +
-        "%'",
-      function (err, result) {
+    } else {
+      con.query("Select * from products", function (err, result) {
         if (err) {
           console.log(err);
           return;
@@ -608,21 +520,291 @@ app.get("/search", function (req, res) {
           "Content-Type": "application/json",
         });
         res.end(JSON.stringify(result));
-      }
-    );
-  } else {
-    con.query(
-      "Select * from users where email='" + req.query.email + "'",
-      function (err, result) {
+      });
+    }
+  });
+});
+
+app.get("/api/products/id/:id", function (req, res) {
+  console.log("Inside Products");
+  const id = req.params.id;
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query("Select * from products", function (err, result) {
         if (err) {
           console.log(err);
           return;
         }
-        console.log(result[0].shopname);
+        const product = result.find((x) => x.id === parseInt(id));
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify(product));
+      });
+    }
+  });
+});
+
+app.get("/ownerdetails/:shopname", function (req, res) {
+  console.log("Inside owner details");
+  const shopname = req.params.shopname;
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from users where shopname ='" + shopname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result[0]));
+        }
+      );
+    }
+  });
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/products/:shopname", function (req, res) {
+  console.log("Inside Shopname products");
+  const shopname = req.params.shopname;
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from products where shopname='" + shopname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
+    }
+  });
+});
+
+//Route to handle Post Request Call
+app.post("/addshopimage", function (req, res) {
+  console.log("Inside Update Profile Post Request");
+  console.log("Req Body : ", req.body);
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "UPDATE shop SET shopimage='" + req.body.shopImage + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Shop Image added");
+        }
+      );
+    }
+  });
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/shopimage/:shopname", function (req, res) {
+  console.log("Inside Shopname products");
+  const shopname = req.params.shopname;
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select shopimage from shop where shopname='" + shopname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result[0]));
+        }
+      );
+    }
+  });
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/productdetails/:name", function (req, res) {
+  console.log("Inside Shopname products");
+  const productname = req.params.name;
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from products where name='" + productname + "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result[0]));
+        }
+      );
+    }
+  });
+});
+
+app.post("/createorder", function (req, res) {
+  console.log("Inside create order");
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
+          req.body.image +
+          "','" +
+          req.body.name +
+          "','" +
+          req.body.shopname +
+          "'," +
+          req.body.quantity +
+          "," +
+          req.body.price +
+          ",'" +
+          req.body.date +
+          "','" +
+          req.body.email +
+          "','" +
+          req.body.currency +
+          "')",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          pool.getConnection(function (err, con) {
+            if (err) {
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end(JSON.stringify(result));
+            } else {
+              con.query(
+                "UPDATE products SET instock= instock-" +
+                  req.body.quantity +
+                  ",totalsales= totalsales+" +
+                  req.body.quantity +
+                  " where shopname='" +
+                  req.body.shopname +
+                  "' and name='" +
+                  req.body.name +
+                  "'",
+                function (err, result) {
+                  if (err) {
+                    console.log(err);
+                    return;
+                  }
+                  res.writeHead(200, {
+                    "Content-Type": "text/plain",
+                  });
+                  res.end("Order Creted");
+                }
+              );
+            }
+          });
+        }
+      );
+    }
+  });
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/orders/:email", function (req, res) {
+  console.log("Inside orders");
+  const email = req.params.email;
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "Select * from orders where customeremail='" +
+          email +
+          "' order by dateofpurchase asc",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
+    }
+  });
+});
+
+app.get("/search", function (req, res) {
+  console.log("Inside Products 1");
+  console.log(req.query.name);
+
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      if (req.query.email === "") {
         con.query(
-          "Select * from (select * from products where shopname!='" +
-            result[0].shopname +
-            "') as filteredproducts where name like '%" +
+          "Select * from products where name like '%" +
             req.query.name +
             "%' or category like '%" +
             req.query.name +
@@ -638,44 +820,110 @@ app.get("/search", function (req, res) {
             res.end(JSON.stringify(result));
           }
         );
+      } else {
+        pool.getConnection(function (err, con) {
+          if (err) {
+            res.writeHead(400, {
+              "Content-Type": "text/plain",
+            });
+            res.end(JSON.stringify(result));
+          } else {
+            con.query(
+              "Select * from users where email='" + req.query.email + "'",
+              function (err, result) {
+                if (err) {
+                  console.log(err);
+                  return;
+                }
+                console.log(result[0].shopname);
+                pool.getConnection(function (err, con) {
+                  if (err) {
+                    res.writeHead(400, {
+                      "Content-Type": "text/plain",
+                    });
+                    res.end(JSON.stringify(result));
+                  } else {
+                    con.query(
+                      "Select * from (select * from products where shopname!='" +
+                        result[0].shopname +
+                        "') as filteredproducts where name like '%" +
+                        req.query.name +
+                        "%' or category like '%" +
+                        req.query.name +
+                        "%'",
+                      function (err, result) {
+                        if (err) {
+                          console.log(err);
+                          return;
+                        }
+                        res.writeHead(200, {
+                          "Content-Type": "application/json",
+                        });
+                        res.end(JSON.stringify(result));
+                      }
+                    );
+                  }
+                });
+              }
+            );
+          }
+        });
       }
-    );
-  }
+    }
+  });
 });
 
 //Route to get All Products when user visits the Home Page
 app.get("/shopsalestotal/:shopname", function (req, res) {
   console.log("Inside Shopname products");
   const shopname = req.params.shopname;
-  con.query(
-    "select sum(totalsales) as totalsales from products where shopname='" +
-      shopname +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
       });
       res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "select sum(totalsales) as totalsales from products where shopname='" +
+          shopname +
+          "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(result));
+        }
+      );
     }
-  );
+  });
 });
 
 //Route to get All Products when user visits the Home Page
 app.get("/categories", function (req, res) {
   console.log("Inside Categories");
-  con.query("Select * from categories", function (err, result) {
+  pool.getConnection(function (err, con) {
     if (err) {
-      console.log(err);
-      return;
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query("Select * from categories", function (err, result) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify(result));
+      });
     }
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(result));
   });
 });
 
@@ -683,127 +931,192 @@ app.get("/categories", function (req, res) {
 app.get("/othersellerproducts/:email", function (req, res) {
   console.log("Inside othersellerproducts");
   const email = req.params.email;
-  con.query(
-    "Select * from users where email='" + email + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      let shopname;
-      console.log(result);
-      try {
-        shopname = result[0].shopname;
-      } catch {
-        shopname = "";
-      }
-
-      console.log(shopname);
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
       con.query(
-        "Select * from products where shopname!='" + shopname + "'",
+        "Select * from users where email='" + email + "'",
         function (err, result) {
           if (err) {
             console.log(err);
             return;
           }
-          res.writeHead(200, {
-            "Content-Type": "application/json",
+          let shopname;
+          console.log(result);
+          try {
+            shopname = result[0].shopname;
+          } catch {
+            shopname = "";
+          }
+          pool.getConnection(function (err, con) {
+            if (err) {
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end(JSON.stringify(result));
+            } else {
+              con.query(
+                "Select * from products where shopname!='" + shopname + "'",
+                function (err, result) {
+                  if (err) {
+                    console.log(err);
+                    return;
+                  }
+                  res.writeHead(200, {
+                    "Content-Type": "application/json",
+                  });
+                  res.end(JSON.stringify(result));
+                }
+              );
+            }
           });
-          res.end(JSON.stringify(result));
         }
       );
     }
-  );
+  });
 });
 
 app.post("/addtofavorites", function (req, res) {
   console.log("Inside add to favorites");
-  con.query(
-    "Select * from favorites where name='" +
-      req.body.name +
-      "' and shopname='" +
-      req.body.shopname +
-      "' and email='" +
-      req.body.email +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      console.log(result);
-      if (result < 1) {
-        con.query(
-          "Insert into favorites (name,shopname,email) values ('" +
-            req.body.name +
-            "','" +
-            req.body.shopname +
-            "','" +
-            req.body.email +
-            "')",
-          function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-            res.writeHead(200, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Added to favorites");
-          }
-        );
-      } else {
-        con.query(
-          "DELETE FROM favorites where id=" + result[0].id,
-          function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-            res.writeHead(400, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Removed from favorites");
-          }
-        );
-      }
-    }
-  );
-});
 
-//Route to get All Products when user visits the Home Page
-app.get("/getfavoriteproducts/:email", function (req, res) {
-  console.log("Inside getfavoriteproducts");
-  console.log(req.params.email);
-  con.query(
-    "SELECT GROUP_CONCAT(QUOTE(name)) as name FROM favorites where email='" +
-      req.params.email +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      console.log(result[0].name);
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
       con.query(
-        "SELECT * from products where name in(" + result[0].name + ")",
+        "Select * from favorites where name='" +
+          req.body.name +
+          "' and shopname='" +
+          req.body.shopname +
+          "' and email='" +
+          req.body.email +
+          "'",
         function (err, result) {
           if (err) {
             console.log(err);
             return;
           }
           console.log(result);
-          res.writeHead(200, {
-            "Content-Type": "application/json",
-          });
-          res.end(JSON.stringify(result));
+          if (result < 1) {
+            pool.getConnection(function (err, con) {
+              if (err) {
+                res.writeHead(400, {
+                  "Content-Type": "text/plain",
+                });
+                res.end(JSON.stringify(result));
+              } else {
+                con.query(
+                  "Insert into favorites (name,shopname,email) values ('" +
+                    req.body.name +
+                    "','" +
+                    req.body.shopname +
+                    "','" +
+                    req.body.email +
+                    "')",
+                  function (err, result) {
+                    if (err) {
+                      console.log(err);
+                      return;
+                    }
+                    res.writeHead(200, {
+                      "Content-Type": "text/plain",
+                    });
+                    res.end("Added to favorites");
+                  }
+                );
+              }
+            });
+          } else {
+            pool.getConnection(function (err, con) {
+              if (err) {
+                res.writeHead(400, {
+                  "Content-Type": "text/plain",
+                });
+                res.end(JSON.stringify(result));
+              } else {
+                con.query(
+                  "DELETE FROM favorites where id=" + result[0].id,
+                  function (err, result) {
+                    if (err) {
+                      console.log(err);
+                      return;
+                    }
+                    res.writeHead(400, {
+                      "Content-Type": "text/plain",
+                    });
+                    res.end("Removed from favorites");
+                  }
+                );
+              }
+            });
+          }
         }
       );
     }
-  );
+  });
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/getfavoriteproducts/:email", function (req, res) {
+  console.log("Inside getfavoriteproducts");
+  console.log(req.params.email);
+  pool.getConnection(function (err, con) {
+    if (err) {
+      res.writeHead(400, {
+        "Content-Type": "text/plain",
+      });
+      res.end(JSON.stringify(result));
+    } else {
+      con.query(
+        "SELECT GROUP_CONCAT(QUOTE(name)) as name FROM favorites where email='" +
+          req.params.email +
+          "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+
+          console.log(result[0].name);
+
+          pool.getConnection(function (err, con) {
+            if (err) {
+              res.writeHead(400, {
+                "Content-Type": "text/plain",
+              });
+              res.end(JSON.stringify(result));
+            } else {
+              con.query(
+                "SELECT * from products where name in(" + result[0].name + ")",
+                function (err, result) {
+                  if (err) {
+                    console.log(err);
+                    return;
+                  }
+                  console.log(result);
+                  res.writeHead(200, {
+                    "Content-Type": "application/json",
+                  });
+                  res.end(JSON.stringify(result));
+                }
+              );
+            }
+          });
+        }
+      );
+    }
+  });
 });
 
 //start your server on port 3001
-app.listen(3001);
-console.log("Server Listening on port 3001");
+if (require.main === module) {
+  app.listen(3001);
+  console.log("Server Listening on port 3001");
+}
