@@ -25,13 +25,11 @@ function ProductPage(props) {
 
   useEffect(() => {
     console.log(id);
-    axios
-      .get("http://localhost:3001/api/products/id/" + id)
-      .then((response) => {
-        //update the state with the response data
-        setProduct(response.data);
-        setMounted(true);
-      });
+    axios.get("/api/products/id/" + id).then((response) => {
+      //update the state with the response data
+      setProduct(response.data);
+      setMounted(true);
+    });
   }, []);
 
   //instock change handler to update state variable with the text entered by the user

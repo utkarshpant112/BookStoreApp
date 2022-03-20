@@ -20,12 +20,12 @@ function HomePage(props) {
     if (userInfo !== null) {
       console.log(userInfo[0].email);
       axios
-        .get("http://localhost:3001/othersellerproducts/" + userInfo[0].email)
+        .get("/othersellerproducts/" + userInfo[0].email)
         .then((response) => {
           dispatch(setproductaction(response.data));
         });
     } else {
-      axios.get("http://localhost:3001/api/products").then((response) => {
+      axios.get("/api/products").then((response) => {
         dispatch(setproductaction(response.data));
       });
     }

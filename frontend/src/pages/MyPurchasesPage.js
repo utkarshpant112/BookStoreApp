@@ -17,14 +17,12 @@ class MuPurchasesPage extends Component {
     };
   }
   componentDidMount() {
-    axios
-      .get("http://localhost:3001/orders/" + localStorage.getItem("email"))
-      .then((response) => {
-        //update the state with the response data
-        this.setState({
-          orders: response.data,
-        });
+    axios.get("/orders/" + localStorage.getItem("email")).then((response) => {
+      //update the state with the response data
+      this.setState({
+        orders: response.data,
       });
+    });
   }
 
   render() {

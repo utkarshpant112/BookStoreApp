@@ -26,7 +26,7 @@ function EtsyNavbar(props) {
   const handleLogout = (e) => {
     console.log("Inside logout");
     dispatch(logout());
-    axios.get("http://localhost:3001/api/products").then((response) => {
+    axios.get("/api/products").then((response) => {
       dispatch(setproductaction(response.data));
     });
     cookie.remove("cookie", { path: "/" });

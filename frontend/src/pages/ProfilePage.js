@@ -33,21 +33,19 @@ function ProfilePage(props) {
 
   useEffect(() => {
     let useremail = localStorage.getItem("email");
-    axios
-      .get("http://localhost:3001/userprofile/" + useremail)
-      .then((response) => {
-        setName(response.data[0].name);
-        setDob(response.data[0].dob);
-        setCity(response.data[0].city);
-        setEmail(response.data[0].email);
-        setPhone(response.data[0].phone);
-        setAddress(response.data[0].address);
-        setCountry(response.data[0].country);
-        setAbout(response.data[0].about);
-        setImage(response.data[0].pic);
-        setPassword(response.data[0].password);
-        setId(response.data[0].id);
-      });
+    axios.get("/userprofile/" + useremail).then((response) => {
+      setName(response.data[0].name);
+      setDob(response.data[0].dob);
+      setCity(response.data[0].city);
+      setEmail(response.data[0].email);
+      setPhone(response.data[0].phone);
+      setAddress(response.data[0].address);
+      setCountry(response.data[0].country);
+      setAbout(response.data[0].about);
+      setImage(response.data[0].pic);
+      setPassword(response.data[0].password);
+      setId(response.data[0].id);
+    });
   }, []);
 
   //name change handler to update state variable with the text entered by the user
@@ -138,16 +136,14 @@ function ProfilePage(props) {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("http://localhost:3001/updateprofile", data)
+        .post("/updateprofile", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200) {
             setMessage(response.data);
-            axios
-              .get("http://localhost:3001/userprofile/" + userInfo[0].email)
-              .then((response) => {
-                dispatch(updateUserInfo(response.data));
-              });
+            axios.get("/userprofile/" + userInfo[0].email).then((response) => {
+              dispatch(updateUserInfo(response.data));
+            });
           }
         })
         .catch((error) => {

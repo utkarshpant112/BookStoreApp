@@ -33,28 +33,22 @@ const ShopPage = (props) => {
 
   useEffect(() => {
     console.log(shopname);
-    axios
-      .get("http://localhost:3001/ownerdetails/" + shopname)
-      .then((response) => {
-        //update the state with the response data
-        setOwner(response.data);
-        if (response.data.email === localStorage.getItem("email")) {
-          setMessage("Shop owner viewing");
-        }
-      });
-    axios
-      .get("http://localhost:3001/shopimage/" + shopname)
-      .then((response) => {
-        setImage(response.data.shopimage);
-      });
-    axios.get("http://localhost:3001/products/" + shopname).then((response) => {
+    axios.get("/ownerdetails/" + shopname).then((response) => {
+      //update the state with the response data
+      setOwner(response.data);
+      if (response.data.email === localStorage.getItem("email")) {
+        setMessage("Shop owner viewing");
+      }
+    });
+    axios.get("/shopimage/" + shopname).then((response) => {
+      setImage(response.data.shopimage);
+    });
+    axios.get("/products/" + shopname).then((response) => {
       setProducts(response.data);
     });
-    axios
-      .get("http://localhost:3001/shopsalestotal/" + shopname)
-      .then((response) => {
-        setsalescount(response.data[0].totalsales);
-      });
+    axios.get("/shopsalestotal/" + shopname).then((response) => {
+      setsalescount(response.data[0].totalsales);
+    });
   }, [shopPageProductsUpdated]);
 
   //image change handler to update state variable with the text entered by the user
@@ -78,11 +72,9 @@ const ShopPage = (props) => {
           //set the with credentials to true
           axios.defaults.withCredentials = true;
           //make a post request with the user data
-          axios
-            .post("http://localhost:3001/addshopimage", data)
-            .then((response) => {
-              console.log("Status Code : ", response.status);
-            });
+          axios.post("/addshopimage", data).then((response) => {
+            console.log("Status Code : ", response.status);
+          });
         });
     }
   };

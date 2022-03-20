@@ -45,17 +45,13 @@ const FavoritesPage = () => {
 
   useEffect(() => {
     let useremail = localStorage.getItem("email");
-    axios
-      .get("http://localhost:3001/userprofile/" + useremail)
-      .then((response) => {
-        setUser(response.data[0]);
-      });
-    axios
-      .get("http://localhost:3001/getfavoriteproducts/" + useremail)
-      .then((response) => {
-        setProducts(response.data);
-        setfilteredProducts(response.data);
-      });
+    axios.get("/userprofile/" + useremail).then((response) => {
+      setUser(response.data[0]);
+    });
+    axios.get("/getfavoriteproducts/" + useremail).then((response) => {
+      setProducts(response.data);
+      setfilteredProducts(response.data);
+    });
     setMounted(true);
   }, [favoriteProductsUpdated]);
 

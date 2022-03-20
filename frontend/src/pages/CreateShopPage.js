@@ -35,17 +35,15 @@ class CreateShopPage extends Component {
       email: localStorage.getItem("email"),
     };
     if (localStorage.getItem("email") != null) {
-      axios
-        .post("http://localhost:3001/isshopalreadycreated", data)
-        .then((response) => {
-          console.log("Status Code : ", response.status);
-          if (response.status === 200) {
-            this.setState({
-              shopcreated: true,
-              shopname: response.data,
-            });
-          }
-        });
+      axios.post("/isshopalreadycreated", data).then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200) {
+          this.setState({
+            shopcreated: true,
+            shopname: response.data,
+          });
+        }
+      });
     }
   }
 
@@ -68,7 +66,7 @@ class CreateShopPage extends Component {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("http://localhost:3001/shopNameAvailable", data)
+        .post("/shopNameAvailable", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200) {
@@ -98,7 +96,7 @@ class CreateShopPage extends Component {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("http://localhost:3001/createshop", data)
+      .post("/createshop", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {

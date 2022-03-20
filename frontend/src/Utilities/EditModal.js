@@ -43,7 +43,7 @@ export default function EditModal(props) {
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("http://localhost:3001/products/" + shopname).then((response) => {
+    axios.get("/products/" + shopname).then((response) => {
       //update the state with the response data
       const abc = [];
       response.data.map((product) =>
@@ -52,7 +52,7 @@ export default function EditModal(props) {
       setOptions(abc);
       setMounted(true);
     });
-    axios.get("http://localhost:3001/categories").then((response) => {
+    axios.get("/categories").then((response) => {
       //update the state with the response data
       setcategoryOptions(response.data);
     });
@@ -62,23 +62,21 @@ export default function EditModal(props) {
   const nameChangeHandler = (e) => {
     setMessage("");
     setName(e.label);
-    axios
-      .get("http://localhost:3001/productdetails/" + e.label)
-      .then((response) => {
-        //update the state with the response data
-        setImage(response.data.image);
-        if (!categoryoptions.includes(response.data.category)) {
-          setotherCategoryTextDisabled(true);
-          setCategory("Others");
-          document.getElementById("other-category").value =
-            response.data.category;
-        } else {
-          setCategory(response.data.category);
-        }
-        setDescription(response.data.description);
-        setPrice(response.data.price);
-        setCountInStock(response.data.instock);
-      });
+    axios.get("/productdetails/" + e.label).then((response) => {
+      //update the state with the response data
+      setImage(response.data.image);
+      if (!categoryoptions.includes(response.data.category)) {
+        setotherCategoryTextDisabled(true);
+        setCategory("Others");
+        document.getElementById("other-category").value =
+          response.data.category;
+      } else {
+        setCategory(response.data.category);
+      }
+      setDescription(response.data.description);
+      setPrice(response.data.price);
+      setCountInStock(response.data.instock);
+    });
   };
 
   //name image handler to update state variable with the image entered by the user
@@ -156,20 +154,18 @@ export default function EditModal(props) {
       //set the with credentials to true
       axios.defaults.withCredentials = true;
       //make a post request with the user data
-      axios
-        .post("http://localhost:3001/updateproduct", data)
-        .then((response) => {
-          console.log("Status Code : ", response.status);
-          if (response.status === 200 && response.data === "Product Updated") {
-            setMessage("Product has been updated");
-            dispatch(shopPageProductsUpdated(true));
-            setTimeout(() => {
-              handleClose();
-            }, 500);
-          } else {
-            setMessage("Product not update");
-          }
-        });
+      axios.post("/updateproduct", data).then((response) => {
+        console.log("Status Code : ", response.status);
+        if (response.status === 200 && response.data === "Product Updated") {
+          setMessage("Product has been updated");
+          dispatch(shopPageProductsUpdated(true));
+          setTimeout(() => {
+            handleClose();
+          }, 500);
+        } else {
+          setMessage("Product not update");
+        }
+      });
     }
   };
 

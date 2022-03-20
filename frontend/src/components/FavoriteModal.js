@@ -39,7 +39,7 @@ export default function FavoriteModal(props) {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("http://localhost:3001/addtofavorites", data)
+        .post("/addtofavorites", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200) {
