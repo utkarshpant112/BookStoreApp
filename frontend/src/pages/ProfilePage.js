@@ -10,6 +10,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useDispatch, useSelector } from "react-redux";
 import { updateUserInfo } from "../actions/userActions";
 import validator from "validator";
+import Button from "react-bootstrap/esm/Button";
 
 //Define a Profile Page Component
 function ProfilePage(props) {
@@ -271,9 +272,10 @@ function ProfilePage(props) {
             </div>
             <br></br>
             <div>
-              <button onClick={submitProfile} class="btn btn-primary">
-                Update Profile
-              </button>
+              <Button>
+                {" "}
+                onClick={submitProfile} class="outline-primary" Update Profile
+              </Button>
             </div>
             <br></br>
             <div class={message ? "visible" : "invisible"}>

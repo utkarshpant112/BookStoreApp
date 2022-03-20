@@ -144,7 +144,7 @@ class CreateShopPage extends Component {
                     />
                     <Button
                       type="button"
-                      variant="primary"
+                      variant="success"
                       onClick={this.shopnameAvailable}
                     >
                       Check Availability
@@ -164,7 +164,7 @@ class CreateShopPage extends Component {
                 >
                   <Button
                     type="button"
-                    variant="primary"
+                    variant="outline-primary"
                     onClick={this.createShop}
                   >
                     Create Shop

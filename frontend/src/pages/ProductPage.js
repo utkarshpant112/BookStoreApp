@@ -175,11 +175,17 @@ function ProductPage(props) {
                       </div>
                       <br></br>
                       <div className="d-grid">
-                        <Button onClick={addToCartHandler} variant="primary">
+                        <Button
+                          onClick={addToCartHandler}
+                          variant="outline-primary"
+                        >
                           Add to Cart
                         </Button>
                         <br></br>
-                        <Button onClick={checkoutHandler} variant="primary">
+                        <Button
+                          onClick={checkoutHandler}
+                          variant="outline-primary"
+                        >
                           Proceed to Checkout
                         </Button>
                       </div>

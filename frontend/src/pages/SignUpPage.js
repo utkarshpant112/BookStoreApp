@@ -3,6 +3,7 @@ import { Navigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { cleearerrormessage, signup } from "../actions/userActions";
 import cookie from "react-cookies";
+import Button from "react-bootstrap/esm/Button";
 
 //Define a Signup Page Component
 export default function SignUpPage(props) {
@@ -76,9 +77,9 @@ export default function SignUpPage(props) {
             </div>
             <br></br>
             <div>
-              <button onClick={submitSignUp} class="btn btn-primary">
+              <Button onClick={submitSignUp} variant="success">
                 Create Account
-              </button>
+              </Button>
             </div>
             <br></br>
             <div class={error ? "visible" : "invisible"}>

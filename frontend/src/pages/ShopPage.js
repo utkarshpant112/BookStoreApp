@@ -131,7 +131,7 @@ const ShopPage = (props) => {
                   message === "Shop owner viewing" ? "visible" : "invisible"
                 }
               >
-                <h6>Items Sold: {salescount}</h6>
+                <h6>Items Sold: {salescount ? salescount : 0}</h6>
               </div>
               <br></br>
               <br></br>

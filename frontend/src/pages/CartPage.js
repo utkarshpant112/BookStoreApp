@@ -148,7 +148,7 @@ function CartPage(props) {
                   <div className="d-grid">
                     <Button
                       type="button"
-                      variant="primary"
+                      variant="outline-primary"
                       onClick={checkoutHandler}
                       disabled={cartItems.length === 0}
                     >

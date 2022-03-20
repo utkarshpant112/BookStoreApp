@@ -58,7 +58,7 @@ function EtsyNavbar(props) {
                 buttonName={"Sell"}
                 redirectTo={"/createshop"}
               ></LoginModal>
-            ) : userInfo[0].shopname === null ? (
+            ) : userInfo[0].shopname === "" ? (
               <Link to="/createshop" className="nav-link">
                 Sell
               </Link>

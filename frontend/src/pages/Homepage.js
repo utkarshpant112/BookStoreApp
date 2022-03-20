@@ -38,7 +38,7 @@ function HomePage(props) {
         <title>Etsy</title>
       </Helmet>
       {userInfo !== null ? (
-        <h1>Welcome back {userInfo[0].name}</h1>
+        <h1>Welcome {userInfo[0].name}</h1>
       ) : (
         <h1>Find something you love</h1>
       )}
