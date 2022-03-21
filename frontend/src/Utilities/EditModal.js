@@ -65,14 +65,15 @@ export default function EditModal(props) {
     axios.get("/productdetails/" + e.label).then((response) => {
       //update the state with the response data
       setImage(response.data.image);
-      if (!categoryoptions.includes(response.data.category)) {
-        setotherCategoryTextDisabled(true);
-        setCategory("Others");
-        document.getElementById("other-category").value =
-          response.data.category;
-      } else {
-        setCategory(response.data.category);
-      }
+      // if (!categoryoptions.includes(response.data.category)) {
+      //   setotherCategoryTextDisabled(true);
+      //   setCategory(response.data.category);
+      //   document.getElementById("other-category").value =
+      //     response.data.category;
+      // } else {
+      //   setCategory(response.data.category);
+      // }
+      setCategory(response.data.category);
       setDescription(response.data.description);
       setPrice(response.data.price);
       setCountInStock(response.data.instock);
