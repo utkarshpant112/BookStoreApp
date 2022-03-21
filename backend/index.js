@@ -60,7 +60,7 @@ var Users = [
 var mysql = require("mysql");
 
 var pool = mysql.createPool({
-  connectionLimit: 1000,
+  connectionLimit: 10000,
   host: "etsy.c5bcnawebmvb.us-east-2.rds.amazonaws.com",
   user: "admin",
   password: "apup%123",
