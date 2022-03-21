@@ -268,9 +268,9 @@ function ProfilePage(props) {
             </div>
             <br></br>
             <div>
-              <Button>
+              <Button onClick={submitProfile} class="outline-primary">
                 {" "}
-                onClick={submitProfile} class="outline-primary" Update Profile
+                Update Profile
               </Button>
             </div>
             <br></br>
