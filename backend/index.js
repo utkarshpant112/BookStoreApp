@@ -83,7 +83,7 @@ app.post("/login", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "SELECT * FROM users where email ='" + req.body.email + "'",
@@ -147,7 +147,7 @@ app.post("/signup", async function (req, res) {
           res.writeHead(400, {
             "Content-Type": "text/plain",
           });
-          res.end(JSON.stringify(result));
+          res.end("Db Coonection error");
         } else {
           con.query(
             "INSERT INTO users (name, email, password) VALUES ('" +
@@ -173,7 +173,7 @@ app.post("/signup", async function (req, res) {
                   res.writeHead(400, {
                     "Content-Type": "text/plain",
                   });
-                  res.end(JSON.stringify(result));
+                  res.end("Db Coonection error");
                 } else {
                   con.query(
                     "SELECT * FROM users where email ='" + req.body.email + "'",
@@ -213,7 +213,7 @@ app.get("/userprofile/:email", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from users where email='" + email + "'",
@@ -243,7 +243,7 @@ app.post("/updateprofile", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "UPDATE users SET name='" +
@@ -297,7 +297,7 @@ app.post("/shopNameAvailable", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from shop where shopname='" + req.body.shopname + "'",
@@ -333,7 +333,7 @@ app.post("/isshopalreadycreated", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select shopname from users where email='" + req.body.email + "'",
@@ -369,7 +369,7 @@ app.post("/createshop", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Insert into shop (shopname,email) values ('" +
@@ -391,7 +391,7 @@ app.post("/createshop", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Update users SET shopname='" +
@@ -423,7 +423,7 @@ app.post("/addproduct", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
@@ -470,7 +470,7 @@ app.post("/updateproduct", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Update products set price='" +
@@ -509,7 +509,7 @@ app.get("/api/products", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query("Select * from products", function (err, result) {
         if (err) {
@@ -533,7 +533,7 @@ app.get("/api/products/id/:id", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query("Select * from products", function (err, result) {
         if (err) {
@@ -558,7 +558,7 @@ app.get("/ownerdetails/:shopname", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from users where shopname ='" + shopname + "'",
@@ -586,7 +586,7 @@ app.get("/products/:shopname", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from products where shopname='" + shopname + "'",
@@ -615,7 +615,7 @@ app.post("/addshopimage", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "UPDATE shop SET shopimage='" + req.body.shopImage + "'",
@@ -644,7 +644,7 @@ app.get("/shopimage/:shopname", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select shopimage from shop where shopname='" + shopname + "'",
@@ -673,7 +673,7 @@ app.get("/productdetails/:name", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from products where name='" + productname + "'",
@@ -700,7 +700,7 @@ app.post("/createorder", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
@@ -730,7 +730,7 @@ app.post("/createorder", function (req, res) {
               res.writeHead(400, {
                 "Content-Type": "text/plain",
               });
-              res.end(JSON.stringify(result));
+              res.end("Db Coonection error");
             } else {
               con.query(
                 "UPDATE products SET instock= instock-" +
@@ -770,7 +770,7 @@ app.get("/orders/:email", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from orders where customeremail='" +
@@ -800,7 +800,7 @@ app.get("/search", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       if (req.query.email === "") {
         con.query(
@@ -826,7 +826,7 @@ app.get("/search", function (req, res) {
             res.writeHead(400, {
               "Content-Type": "text/plain",
             });
-            res.end(JSON.stringify(result));
+            res.end("Db Coonection error");
           } else {
             con.query(
               "Select * from users where email='" + req.query.email + "'",
@@ -841,7 +841,7 @@ app.get("/search", function (req, res) {
                     res.writeHead(400, {
                       "Content-Type": "text/plain",
                     });
-                    res.end(JSON.stringify(result));
+                    res.end("Db Coonection error");
                   } else {
                     con.query(
                       "Select * from (select * from products where shopname!='" +
@@ -882,7 +882,7 @@ app.get("/shopsalestotal/:shopname", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "select sum(totalsales) as totalsales from products where shopname='" +
@@ -911,7 +911,7 @@ app.get("/categories", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query("Select * from categories", function (err, result) {
         if (err) {
@@ -936,7 +936,7 @@ app.get("/othersellerproducts/:email", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from users where email='" + email + "'",
@@ -957,7 +957,7 @@ app.get("/othersellerproducts/:email", function (req, res) {
               res.writeHead(400, {
                 "Content-Type": "text/plain",
               });
-              res.end(JSON.stringify(result));
+              res.end("Db Coonection error");
             } else {
               con.query(
                 "Select * from products where shopname!='" + shopname + "'",
@@ -988,7 +988,7 @@ app.post("/addtofavorites", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "Select * from favorites where name='" +
@@ -1010,7 +1010,7 @@ app.post("/addtofavorites", function (req, res) {
                 res.writeHead(400, {
                   "Content-Type": "text/plain",
                 });
-                res.end(JSON.stringify(result));
+                res.end("Db Coonection error");
               } else {
                 con.query(
                   "Insert into favorites (name,shopname,email) values ('" +
@@ -1039,7 +1039,7 @@ app.post("/addtofavorites", function (req, res) {
                 res.writeHead(400, {
                   "Content-Type": "text/plain",
                 });
-                res.end(JSON.stringify(result));
+                res.end("Db Coonection error");
               } else {
                 con.query(
                   "DELETE FROM favorites where id=" + result[0].id,
@@ -1072,7 +1072,7 @@ app.get("/getfavoriteproducts/:email", function (req, res) {
       res.writeHead(400, {
         "Content-Type": "text/plain",
       });
-      res.end(JSON.stringify(result));
+      res.end("Db Coonection error");
     } else {
       con.query(
         "SELECT GROUP_CONCAT(QUOTE(name)) as name FROM favorites where email='" +
@@ -1091,7 +1091,7 @@ app.get("/getfavoriteproducts/:email", function (req, res) {
               res.writeHead(400, {
                 "Content-Type": "text/plain",
               });
-              res.end(JSON.stringify(result));
+              res.end("Db Coonection error");
             } else {
               con.query(
                 "SELECT * from products where name in(" + result[0].name + ")",
