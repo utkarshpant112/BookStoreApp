@@ -108,7 +108,6 @@ router.post("/addshopimage", function (req, res) {
 
 //Route to get All Products when user visits the Home Page
 router.get("/shopimage/:shopname", function (req, res) {
-  console.log("Inside Shopname products");
   const shopname = req.params.shopname;
   pool.query(
     "Select shopimage from shop where shopname='" + shopname + "'",

@@ -4,7 +4,6 @@ const pool = require("../db");
 
 //Route to get All Products when user visits the Home Page
 router.get("/", function (req, res) {
-  console.log("Inside Products");
   pool.query("Select * from products", function (err, result) {
     if (err) {
       console.log(err);
@@ -84,7 +83,6 @@ router.post("/updateproduct", function (req, res) {
 });
 
 router.get("/id/:id", function (req, res) {
-  console.log("Inside Products");
   const id = req.params.id;
   pool.query("Select * from products", function (err, result) {
     if (err) {
@@ -100,8 +98,7 @@ router.get("/id/:id", function (req, res) {
 });
 
 //Route to get All Products when user visits the Home Page
-router.get("/:shopname", function (req, res) {
-  console.log("Inside Shopname products");
+router.get("/shopproducts/:shopname", function (req, res) {
   const shopname = req.params.shopname;
   pool.query(
     "Select * from products where shopname='" + shopname + "'",
@@ -120,7 +117,6 @@ router.get("/:shopname", function (req, res) {
 
 //Route to get All Products when user visits the Home Page
 router.get("/productdetails/:name", function (req, res) {
-  console.log("Inside Shopname products");
   const productname = req.params.name;
   pool.query(
     "Select * from products where name='" + productname + "'",

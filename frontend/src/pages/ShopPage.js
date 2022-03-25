@@ -43,7 +43,7 @@ const ShopPage = (props) => {
     axios.get("/api/shop/shopimage/" + shopname).then((response) => {
       setImage(response.data.shopimage);
     });
-    axios.get("/api/products/" + shopname).then((response) => {
+    axios.get("/api/products/shopproducts/" + shopname).then((response) => {
       setProducts(response.data);
     });
     axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
