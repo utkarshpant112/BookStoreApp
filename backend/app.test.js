@@ -9,7 +9,6 @@ describe("POST users LOGIN API call", () => {
   };
   it("should return user details(for storing in redux) when the user logs in", async () => {
     const response = await axios.post("http://localhost:5000/login", data);
-    console.log(response);
     assert.strictEqual(response.status, 200);
     assert.strictEqual(response.data[0].name, "John Doe");
     assert.strictEqual(response.data[0].email, "testuser@gmail.com");
@@ -58,7 +57,6 @@ describe("GET CATEGORIES API call", () => {
   ];
   it("should return 200 status and the list of categories", async () => {
     const response = await axios.get("http://localhost:5000/categories");
-    console.log(response.data);
     assert.strictEqual(response.status, 200);
     assert.deepEqual(response.data, options);
   });

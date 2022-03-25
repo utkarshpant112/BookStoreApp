@@ -24,7 +24,7 @@ class MuPurchasesPage extends Component {
           orders: response.data,
         });
       });
-    }, 500);
+    }, 100);
   }
   render() {
     return this.state.orders.length === 0 ? (
