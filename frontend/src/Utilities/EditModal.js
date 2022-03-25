@@ -43,7 +43,7 @@ export default function EditModal(props) {
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("/products/" + shopname).then((response) => {
+    axios.get("/api//products/" + shopname).then((response) => {
       //update the state with the response data
       const abc = [];
       response.data.map((product) =>
@@ -52,7 +52,7 @@ export default function EditModal(props) {
       setOptions(abc);
       setMounted(true);
     });
-    axios.get("/categories").then((response) => {
+    axios.get("/api/products/categories").then((response) => {
       //update the state with the response data
       setcategoryOptions(response.data);
     });
@@ -62,7 +62,7 @@ export default function EditModal(props) {
   const nameChangeHandler = (e) => {
     setMessage("");
     setName(e.label);
-    axios.get("/productdetails/" + e.label).then((response) => {
+    axios.get("/api/products/productdetails/" + e.label).then((response) => {
       //update the state with the response data
       setImage(response.data.image);
       // if (!categoryoptions.includes(response.data.category)) {
@@ -155,7 +155,7 @@ export default function EditModal(props) {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("/updateproduct", data).then((response) => {
+    axios.post("/api/products/updateproduct", data).then((response) => {
       console.log("Status Code : ", response.status);
       if (response.status === 200 && response.data === "Product Updated") {
         setMessage("Product has been updated");

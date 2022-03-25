@@ -20,7 +20,7 @@ function HomePage(props) {
     if (userInfo !== null) {
       console.log(userInfo[0].email);
       axios
-        .get("/othersellerproducts/" + userInfo[0].email)
+        .get("/api/products/othersellerproducts/" + userInfo[0].email)
         .then((response) => {
           dispatch(setproductaction(response.data));
         });

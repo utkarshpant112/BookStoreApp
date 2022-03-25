@@ -27,7 +27,7 @@ export const login = (email, password) => async (dispatch) => {
     console.log(email, password);
     axios.defaults.withCredentials = true;
     axios
-      .post("/login", data)
+      .post("/api/auth/login", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
         console.log("Status data : ", response.data);
@@ -71,7 +71,7 @@ export const signup = (name, email, password) => async (dispatch) => {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("/signup", data)
+      .post("/api/auth/signup", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {

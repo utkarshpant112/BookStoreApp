@@ -35,7 +35,7 @@ class CreateShopPage extends Component {
       email: localStorage.getItem("email"),
     };
     if (localStorage.getItem("email") != null) {
-      axios.post("/isshopalreadycreated", data).then((response) => {
+      axios.post("/api/shop/isshopalreadycreated", data).then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {
           this.setState({
@@ -66,7 +66,7 @@ class CreateShopPage extends Component {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("/shopNameAvailable", data)
+        .post("/api/shop/shopNameAvailable", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200) {
@@ -96,7 +96,7 @@ class CreateShopPage extends Component {
     axios.defaults.withCredentials = true;
 
     axios
-      .post("/createshop", data)
+      .post("/api/shop/createshop", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {

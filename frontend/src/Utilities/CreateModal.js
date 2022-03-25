@@ -93,7 +93,7 @@ export default function CreateModal(props) {
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("/categories").then((response) => {
+    axios.get("/api/products/categories").then((response) => {
       //update the state with the response data
       setOptions(response.data);
     });
@@ -122,7 +122,7 @@ export default function CreateModal(props) {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("/addproduct", data)
+        .post("/api/products/addproduct", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200 && response.data === "Product Added") {

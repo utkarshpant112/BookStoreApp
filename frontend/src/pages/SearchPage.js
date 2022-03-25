@@ -24,7 +24,7 @@ export default function SearchPage(props) {
       email = userInfo[0].email;
     }
     axios
-      .get("/search", {
+      .get("/api/products/search", {
         params: {
           name: name,
           email: email,
@@ -119,7 +119,7 @@ export default function SearchPage(props) {
     switch (price) {
       case "first":
         await axios
-          .get("/search", {
+          .get("/api/products/search", {
             params: {
               name: name,
               email: email,
@@ -133,7 +133,7 @@ export default function SearchPage(props) {
         break;
       case "second":
         await axios
-          .get("/search", {
+          .get("/api/products/search", {
             params: {
               name: name,
               email: email,
@@ -149,7 +149,7 @@ export default function SearchPage(props) {
         break;
       case "third":
         await axios
-          .get("/search", {
+          .get("/api/products/search", {
             params: {
               name: name,
               email: email,
@@ -161,7 +161,7 @@ export default function SearchPage(props) {
         break;
       default:
         await axios
-          .get("/search", {
+          .get("/api/products/search", {
             params: {
               name: name,
               email: email,

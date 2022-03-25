@@ -33,20 +33,20 @@ const ShopPage = (props) => {
 
   useEffect(() => {
     console.log(shopname);
-    axios.get("/ownerdetails/" + shopname).then((response) => {
+    axios.get("/api/user/ownerdetails/" + shopname).then((response) => {
       //update the state with the response data
       setOwner(response.data);
       if (response.data.email === localStorage.getItem("email")) {
         setMessage("Shop owner viewing");
       }
     });
-    axios.get("/shopimage/" + shopname).then((response) => {
+    axios.get("/api/shop/shopimage/" + shopname).then((response) => {
       setImage(response.data.shopimage);
     });
-    axios.get("/products/" + shopname).then((response) => {
+    axios.get("/api/products/" + shopname).then((response) => {
       setProducts(response.data);
     });
-    axios.get("/shopsalestotal/" + shopname).then((response) => {
+    axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
       setsalescount(response.data[0].totalsales);
     });
   }, [shopPageProductsUpdated]);
@@ -72,7 +72,7 @@ const ShopPage = (props) => {
           //set the with credentials to true
           axios.defaults.withCredentials = true;
           //make a post request with the user data
-          axios.post("/addshopimage", data).then((response) => {
+          axios.post("/api/shop/addshopimage", data).then((response) => {
             console.log("Status Code : ", response.status);
           });
         });

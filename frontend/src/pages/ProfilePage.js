@@ -33,7 +33,7 @@ function ProfilePage(props) {
 
   useEffect(() => {
     let useremail = localStorage.getItem("email");
-    axios.get("/userprofile/" + useremail).then((response) => {
+    axios.get("/api/user/userprofile/" + useremail).then((response) => {
       setName(response.data[0].name);
       setDob(response.data[0].dob);
       setCity(response.data[0].city);
@@ -136,14 +136,16 @@ function ProfilePage(props) {
       axios.defaults.withCredentials = true;
       //make a post request with the user data
       axios
-        .post("/updateprofile", data)
+        .post("/api/user/updateprofile", data)
         .then((response) => {
           console.log("Status Code : ", response.status);
           if (response.status === 200) {
             setMessage(response.data);
-            axios.get("/userprofile/" + userInfo[0].email).then((response) => {
-              dispatch(updateUserInfo(response.data));
-            });
+            axios
+              .get("/api/user/userprofile/" + userInfo[0].email)
+              .then((response) => {
+                dispatch(updateUserInfo(response.data));
+              });
           }
         })
         .catch((error) => {

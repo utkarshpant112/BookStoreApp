@@ -54,7 +54,7 @@ function CartPage(props) {
 
       axios.defaults.withCredentials = true;
       //make a post request with the user data
-      axios.post("/createorder", data).then((response) => {
+      axios.post("/api/order/createorder", data).then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200 && response.data === "order Created") {
           setmessage("Order Created");

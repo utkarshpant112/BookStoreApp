@@ -64,10 +64,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:3001",
-  "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.17.7",
-    "@babel/preset-env": "^7.16.11",
-    "babel-jest": "^27.5.1"
-  }
+  "proxy": "http://localhost:3001"
 }
