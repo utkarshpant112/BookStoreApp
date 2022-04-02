@@ -6,7 +6,11 @@ import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router";
-import { setproductaction } from "../actions/productactions";
+import {
+  getAllProductsaction,
+  getOtherSellerProductsaction,
+  setproductaction,
+} from "../actions/productactions";
 
 function HomePage(props) {
   // const [products, setproducts] = useState([]);
@@ -19,15 +23,9 @@ function HomePage(props) {
   useEffect(() => {
     if (userInfo !== null) {
       console.log(userInfo[0].email);
-      axios
-        .get("/api/products/othersellerproducts/" + userInfo[0].email)
-        .then((response) => {
-          dispatch(setproductaction(response.data));
-        });
+      dispatch(getOtherSellerProductsaction(userInfo[0].email));
     } else {
-      axios.get("/api/products").then((response) => {
-        dispatch(setproductaction(response.data));
-      });
+      dispatch(getAllProductsaction());
     }
     setMounted(true);
   }, [isLoggedIn]);
@@ -45,7 +43,7 @@ function HomePage(props) {
       <div className="products">
         <Row>
           {products !== null ? (
-            products.products.map((product) => (
+            products.map((product) => (
               <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
                 <Product product={product}></Product>
               </Col>

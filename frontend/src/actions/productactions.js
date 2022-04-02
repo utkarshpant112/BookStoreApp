@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import {
   SET_PRODUCTS,
   SHOP_PAGE_PRODUCTS_UPDATED,
@@ -5,6 +7,18 @@ import {
 
 export const setproductaction = (products) => async (dispatch) => {
   dispatch({ type: SET_PRODUCTS, payload: { products } });
+};
+
+export const getAllProductsaction = () => async (dispatch) => {
+  axios.get("/api/products").then((response) => {
+    dispatch({ type: SET_PRODUCTS, payload: response.data });
+  });
+};
+
+export const getOtherSellerProductsaction = (email) => async (dispatch) => {
+  axios.get("/api/products/othersellerproducts/" + email).then((response) => {
+    dispatch({ type: SET_PRODUCTS, payload: response.data });
+  });
 };
 
 export const shopPageProductsUpdated = (data) => async (dispatch) => {

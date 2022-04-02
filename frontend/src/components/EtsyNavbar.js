@@ -15,7 +15,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout, signin, signout } from "../actions/userActions";
 import { connect } from "react-redux";
 import axios from "axios";
-import { setproductaction } from "../actions/productactions";
+import {
+  getAllProductsaction,
+  setproductaction,
+} from "../actions/productactions";
 
 function EtsyNavbar(props) {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -26,9 +29,7 @@ function EtsyNavbar(props) {
   const handleLogout = (e) => {
     console.log("Inside logout");
     dispatch(logout());
-    axios.get("/api/products").then((response) => {
-      dispatch(setproductaction(response.data));
-    });
+    dispatch(getAllProductsaction());
     cookie.remove("cookie", { path: "/" });
   };
 

@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import ListGroup from "react-bootstrap/ListGroup";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
 import { Link } from "react-router-dom";
@@ -121,6 +122,21 @@ function CartPage(props) {
                   <Col md={2}>
                     {currency}{" "}
                     {parseFloat(item.price * item.quantity).toFixed(2)}
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={4}>
+                    <Form>
+                      {["checkbox"].map((type) => (
+                        <div key={`default-${type}`} className="mb-3">
+                          <Form.Check
+                            type={type}
+                            id={`default-${type}`}
+                            label="Gift wrap the item"
+                          />
+                        </div>
+                      ))}
+                    </Form>
                   </Col>
                 </Row>
               </ListGroup.Item>
