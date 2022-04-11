@@ -33,7 +33,7 @@ export const login = (email, password) => async (dispatch) => {
         console.log("Status data : ", response.data);
         if (response.status === 200) {
           localStorage.setItem("email", email);
-          localStorage.setItem("shopname", response.data[0].shopname);
+          localStorage.setItem("shopname", response.data.shopname);
           console.log(response.data);
           dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
         }

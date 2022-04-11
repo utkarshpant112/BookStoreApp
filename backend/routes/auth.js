@@ -58,7 +58,7 @@ router.post("/signup", async function (req, res) {
         return console.log("Cannot encrypt");
       }
       hashedPassword = hash;
-
+      console.log(hashedPassword);
       pool.query(
         "INSERT INTO users (name, email, password) VALUES ('" +
           req.body.name +

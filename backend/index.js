@@ -34,7 +34,26 @@ app.use(function (req, res, next) {
   next();
 });
 
-const authRoute = require("./routes/auth");
+const { mongoDB } = require("./config");
+const mongoose = require("mongoose");
+require("./models/UserModel");
+
+var options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxpoolSize: 500,
+};
+
+mongoose.connect(mongoDB, options, (err, res) => {
+  if (err) {
+    console.log(err);
+    console.log(`MongoDB Connection Failed`);
+  } else {
+    console.log(`MongoDB Connected`);
+  }
+});
+
+const authRoute = require("./mongoRoutes/auth");
 const productRoute = require("./routes/product");
 const userRoute = require("./routes/user");
 const shopRoute = require("./routes/shop");
