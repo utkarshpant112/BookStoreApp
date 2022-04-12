@@ -43,7 +43,7 @@ export default function EditModal(props) {
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("/api//products/" + shopname).then((response) => {
+    axios.get("/api/products/shopproducts/" + shopname).then((response) => {
       //update the state with the response data
       const abc = [];
       response.data.map((product) =>

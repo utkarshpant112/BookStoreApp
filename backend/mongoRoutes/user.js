@@ -82,7 +82,7 @@ router.get("/ownerdetails/:shopname", function (req, res) {
       res.end("Unable to find user");
     }
     if (user) {
-      res.user(200, {
+      res.writeHead(200, {
         "Content-Type": "text/plain",
       });
       res.end(JSON.stringify(user));

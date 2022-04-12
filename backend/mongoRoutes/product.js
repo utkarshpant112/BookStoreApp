@@ -2,7 +2,7 @@ const router = require("express").Router();
 var mysql = require("mysql");
 const pool = require("../db");
 const Products = require("../models/ProductModel");
-const Categories = require("../models/CategoryModel");
+const Categorys = require("../models/CategoryModel");
 
 //Route to get All Products when user visits the Home Page
 router.get("/", function (req, res) {
@@ -119,7 +119,7 @@ router.get("/id/:id", function (req, res) {
       res.end("Internal Server Error - No products found");
     }
     if (products) {
-      const product = result.find((x) => x._id === parseInt(id));
+      const product = products.find((x) => x._id === parseInt(id));
       res.writeHead(200, {
         "Content-Type": "application/json",
       });
@@ -185,7 +185,7 @@ router.get("/productdetails/:name", function (req, res) {
 //Route to get All Products when user visits the Home Page
 router.get("/categories", function (req, res) {
   console.log("Inside Categories");
-  Categories.find((error, categories) => {
+  Categorys.find((error, categories) => {
     if (error) {
       console.log(error);
       res.writeHead(500, {

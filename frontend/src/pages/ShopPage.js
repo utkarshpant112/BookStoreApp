@@ -34,14 +34,14 @@ const ShopPage = (props) => {
       }
     });
     axios.get("/api/shop/shopimage/" + shopname).then((response) => {
-      setImage(response.data.shopimage);
+      setImage(response.data);
     });
     axios.get("/api/products/shopproducts/" + shopname).then((response) => {
       setProducts(response.data);
     });
-    axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
-      setsalescount(response.data.totalsales);
-    });
+    // axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
+    //   setsalescount(response.data.totalsales);
+    // });
   }, [shopPageProductsUpdated]);
 
   //image change handler to update state variable with the text entered by the user
@@ -60,6 +60,7 @@ const ShopPage = (props) => {
           //prevent page from refresh
           e.preventDefault();
           const data = {
+            shopname: shopname,
             shopImage: downloadURL,
           };
           //set the with credentials to true

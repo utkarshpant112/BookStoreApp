@@ -113,7 +113,7 @@ router.post("/addshopimage", function (req, res) {
   console.log("Req Body : ", req.body);
   Shop.findOneAndUpdate(
     { shopname: req.body.shopname },
-    { shopImage: req.body.shopImage }
+    { shopimage: req.body.shopImage }
   )
     .then((shop) => {
       if (shop) {
