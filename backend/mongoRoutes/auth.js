@@ -53,7 +53,7 @@ router.post("/signup", async function (req, res) {
       hashedPassword = hash;
       console.log(hashedPassword);
       var newUser = new Users({
-        name: req.body.email,
+        name: req.body.name,
         email: req.body.email,
         password: hashedPassword,
       });

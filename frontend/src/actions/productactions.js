@@ -15,10 +15,12 @@ export const getAllProductsaction = () => async (dispatch) => {
   });
 };
 
-export const getOtherSellerProductsaction = (email) => async (dispatch) => {
-  axios.get("/api/products/othersellerproducts/" + email).then((response) => {
-    dispatch({ type: SET_PRODUCTS, payload: response.data });
-  });
+export const getOtherSellerProductsaction = (shopname) => async (dispatch) => {
+  axios
+    .get("/api/products/othersellerproducts/" + shopname)
+    .then((response) => {
+      dispatch({ type: SET_PRODUCTS, payload: response.data });
+    });
 };
 
 export const shopPageProductsUpdated = (data) => async (dispatch) => {

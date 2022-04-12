@@ -37,6 +37,9 @@ app.use(function (req, res, next) {
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
 require("./models/UserModel");
+require("./models/ShopModel");
+require("./models/ProductModel");
+require("./models/CategoryModel");
 
 var options = {
   useNewUrlParser: true,
@@ -54,9 +57,9 @@ mongoose.connect(mongoDB, options, (err, res) => {
 });
 
 const authRoute = require("./mongoRoutes/auth");
-const productRoute = require("./routes/product");
-const userRoute = require("./routes/user");
-const shopRoute = require("./routes/shop");
+const productRoute = require("./mongoRoutes/product");
+const userRoute = require("./mongoRoutes/user");
+const shopRoute = require("./mongoRoutes/shop");
 const orderRoute = require("./routes/order");
 const favoriteRoute = require("./routes/favorite");
 

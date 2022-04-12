@@ -22,8 +22,8 @@ function HomePage(props) {
 
   useEffect(() => {
     if (userInfo !== null) {
-      console.log(userInfo[0].email);
-      dispatch(getOtherSellerProductsaction(userInfo[0].email));
+      console.log(userInfo.shopname);
+      dispatch(getOtherSellerProductsaction(userInfo.shopname));
     } else {
       dispatch(getAllProductsaction());
     }
@@ -36,7 +36,7 @@ function HomePage(props) {
         <title>Etsy</title>
       </Helmet>
       {userInfo !== null ? (
-        <h1>Welcome {userInfo[0].name}</h1>
+        <h1>Welcome {userInfo.name}</h1>
       ) : (
         <h1>Find something you love</h1>
       )}

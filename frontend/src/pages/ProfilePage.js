@@ -34,17 +34,17 @@ function ProfilePage(props) {
   useEffect(() => {
     let useremail = localStorage.getItem("email");
     axios.get("/api/user/userprofile/" + useremail).then((response) => {
-      setName(response.data[0].name);
-      setDob(response.data[0].dob);
-      setCity(response.data[0].city);
-      setEmail(response.data[0].email);
-      setPhone(response.data[0].phone);
-      setAddress(response.data[0].address);
-      setCountry(response.data[0].country);
-      setAbout(response.data[0].about);
-      setImage(response.data[0].pic);
-      setPassword(response.data[0].password);
-      setId(response.data[0].id);
+      setName(response.data.name);
+      setDob(response.data.dob);
+      setCity(response.data.city);
+      setEmail(response.data.email);
+      setPhone(response.data.phone);
+      setAddress(response.data.address);
+      setCountry(response.data.country);
+      setAbout(response.data.about);
+      setImage(response.data.pic);
+      setPassword(response.data.password);
+      setId(response.data.id);
     });
   }, []);
 
@@ -124,7 +124,7 @@ function ProfilePage(props) {
         dob: dob,
         city: city,
         phone: phone,
-        currentemail: userInfo[0].email,
+        currentemail: userInfo.email,
         email: email,
         address: address,
         country: country,
@@ -142,7 +142,7 @@ function ProfilePage(props) {
           if (response.status === 200) {
             setMessage(response.data);
             axios
-              .get("/api/user/userprofile/" + userInfo[0].email)
+              .get("/api/user/userprofile/" + userInfo.email)
               .then((response) => {
                 dispatch(updateUserInfo(response.data));
               });

@@ -24,13 +24,6 @@ const ShopPage = (props) => {
     (state) => state.shopPageProductsUpdated
   );
 
-  // const [mounted, setMounted] = useState(false);
-
-  // // useEffect(() => {
-  // //   setMounted(true);
-  // //   setMounted(false);
-  // // }, [shopPageProductsUpdated]);
-
   useEffect(() => {
     console.log(shopname);
     axios.get("/api/user/ownerdetails/" + shopname).then((response) => {
@@ -47,7 +40,7 @@ const ShopPage = (props) => {
       setProducts(response.data);
     });
     axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
-      setsalescount(response.data[0].totalsales);
+      setsalescount(response.data.totalsales);
     });
   }, [shopPageProductsUpdated]);
 
