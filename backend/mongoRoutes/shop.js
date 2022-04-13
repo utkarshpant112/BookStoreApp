@@ -3,6 +3,7 @@ var mysql = require("mysql");
 const pool = require("../db");
 const Shop = require("../models/ShopModel");
 const Users = require("../models/UserModel");
+const Products = require("../models/ProductModel");
 
 router.post("/shopNameAvailable", function (req, res) {
   console.log("Inside Shop name available");
@@ -163,21 +164,32 @@ router.get("/shopimage/:shopname", function (req, res) {
 router.get("/shopsalestotal/:shopname", function (req, res) {
   console.log("Inside Shopname products");
   const shopname = req.params.shopname;
-  pool.query(
-    "select sum(totalsales) as totalsales from products where shopname='" +
-      shopname +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
+
+  Products.find({ shopname: req.params.shopname }, (error, products) => {
+    if (error) {
+      console.log(error);
+      res.writeHead(500, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Internal Server Error - No products found");
+    }
+    if (products) {
+      var total = 0;
+      products.forEach((product) => {
+        total += product.totalsales;
+      });
+
       res.writeHead(200, {
         "Content-Type": "application/json",
       });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify(total));
+    } else {
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Cannot find sum of total sales");
     }
-  );
+  });
 });
 
 module.exports = router;
