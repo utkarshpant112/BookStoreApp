@@ -46,7 +46,7 @@ const FavoritesPage = () => {
   useEffect(() => {
     let useremail = localStorage.getItem("email");
     axios.get("/api/user/userprofile/" + useremail).then((response) => {
-      setUser(response.data[0]);
+      setUser(response.data);
     });
     axios
       .get("/api/favorite/getfavoriteproducts/" + useremail)
@@ -105,7 +105,7 @@ const FavoritesPage = () => {
         <div className="products">
           <Row>
             {filteredproducts.map((product) => (
-              <Col key={product.id} sm={6} md={4} lg={3} className="mb-3">
+              <Col key={product._id} sm={6} md={4} lg={3} className="mb-3">
                 <Product product={product}></Product>
               </Col>
             ))}

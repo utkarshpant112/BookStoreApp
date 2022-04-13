@@ -61,7 +61,7 @@ const productRoute = require("./mongoRoutes/product");
 const userRoute = require("./mongoRoutes/user");
 const shopRoute = require("./mongoRoutes/shop");
 const orderRoute = require("./routes/order");
-const favoriteRoute = require("./routes/favorite");
+const favoriteRoute = require("./mongoRoutes/favorite");
 
 app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);
