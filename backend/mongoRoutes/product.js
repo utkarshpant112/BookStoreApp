@@ -236,54 +236,55 @@ router.get("/othersellerproducts/:shopname", function (req, res) {
 router.get("/search", function (req, res) {
   console.log("Inside Products 1");
   console.log(req.query.name);
-  if (req.query.email === "") {
-    pool.query(
-      "Select * from products where name like '%" +
-        req.query.name +
-        "%' or category like '%" +
-        req.query.name +
-        "%'",
-      function (err, result) {
-        if (err) {
-          console.log(err);
-          return;
+  if (req.query.shopname === "") {
+    Products.find({
+      name: { $regex: ".*" + req.query.name + ".*", $options: "i" },
+    })
+      .then((products) => {
+        if (products) {
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(products));
+        } else {
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("No products found");
         }
-        res.writeHead(200, {
-          "Content-Type": "application/json",
+      })
+      .catch((err) => {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
         });
-        res.end(JSON.stringify(result));
-      }
-    );
+        console.log(err);
+        res.end("Error in finding products");
+      });
   } else {
-    pool.query(
-      "Select * from users where email='" + req.query.email + "'",
-      function (err, result) {
-        if (err) {
-          console.log(err);
-          return;
+    Products.find({
+      name: { $regex: ".*" + req.query.name + ".*", $options: "i" },
+      shopname: { $nin: req.query.shopname },
+    })
+      .then((products) => {
+        if (products) {
+          res.writeHead(200, {
+            "Content-Type": "application/json",
+          });
+          res.end(JSON.stringify(products));
+        } else {
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("No products found");
         }
-        console.log(result[0].shopname);
-        pool.query(
-          "Select * from (select * from products where shopname!='" +
-            result[0].shopname +
-            "') as filteredproducts where name like '%" +
-            req.query.name +
-            "%' or category like '%" +
-            req.query.name +
-            "%'",
-          function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-            res.writeHead(200, {
-              "Content-Type": "application/json",
-            });
-            res.end(JSON.stringify(result));
-          }
-        );
-      }
-    );
+      })
+      .catch((err) => {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
+        });
+        console.log(err);
+        res.end("Error in finding products");
+      });
   }
 });
 

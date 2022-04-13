@@ -19,15 +19,15 @@ export default function SearchPage(props) {
   const { name } = useParams();
 
   useEffect(() => {
-    var email = "";
+    var shopname = "";
     if (userInfo !== null) {
-      email = userInfo[0].email;
+      shopname = userInfo.shopname;
     }
     axios
       .get("/api/products/search", {
         params: {
           name: name,
-          email: email,
+          shopname: shopname,
         },
       })
       .then((response) => {
