@@ -110,7 +110,7 @@ router.post("/updateproduct", function (req, res) {
 
 router.get("/id/:id", function (req, res) {
   const id = req.params.id;
-  Products.find((error, products) => {
+  Products.findOne({ _id: req.params.id }, (error, product) => {
     if (error) {
       console.log(error);
       res.writeHead(500, {
@@ -118,8 +118,8 @@ router.get("/id/:id", function (req, res) {
       });
       res.end("Internal Server Error - No products found");
     }
-    if (products) {
-      const product = products.find((x) => x._id === parseInt(id));
+    if (product) {
+      console.log(id);
       res.writeHead(200, {
         "Content-Type": "application/json",
       });

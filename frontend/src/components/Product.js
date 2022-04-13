@@ -11,11 +11,11 @@ function Product(props) {
   const navigate = useNavigate();
 
   const navigateToProductPage = () => {
-    navigate("/product/" + product.id);
+    navigate("/product/" + product._id);
   };
   return (
     <Card className="product-card">
-      <Link to={`/product/${product.id}`} classname="card-link">
+      <Link to={`/product/${product._id}`} classname="card-link">
         <img src={product.image} className="card-img-top" alt={product.name} />{" "}
       </Link>
       <div>
