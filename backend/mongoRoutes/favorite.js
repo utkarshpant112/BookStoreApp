@@ -81,11 +81,15 @@ router.get("/getfavoriteproducts/:email", function (req, res) {
       res.end("Internal Server Error - No products found");
     }
     if (favorites) {
-      var productList = [];
-      var count = 0;
-      console.log(favorites.length);
-      favorites.map((favorite) => {
-        Products.findOne({ name: favorite.name }, (error, product) => {
+      Products.find(
+        {
+          name: {
+            $in: favorites.map((favorite) => {
+              return favorite.name;
+            }),
+          },
+        },
+        (error, products) => {
           if (error) {
             console.log(error);
             res.writeHead(500, {
@@ -93,21 +97,15 @@ router.get("/getfavoriteproducts/:email", function (req, res) {
             });
             res.end("Internal Server Error - No products found");
           }
-          if (product) {
-            count++;
-            productList.push(product);
-            console.log(productList);
-            if (count === favorites.length) {
-              res.writeHead(200, {
-                "Content-Type": "text/plain",
-              });
-              console.log(productList);
-              res.end(JSON.stringify(productList));
-            }
+          if (products) {
+            res.writeHead(200, {
+              "Content-Type": "text/plain",
+            });
+            res.end(JSON.stringify(products));
           } else {
           }
-        });
-      });
+        }
+      );
     } else {
       res.writeHead(200, {
         "Content-Type": "text/plain",
