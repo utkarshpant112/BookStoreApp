@@ -47,7 +47,7 @@ function ProductPage(props) {
       setMessage("Please enter a valid quantity.");
     } else if (localStorage.getItem("cartItems") != null) {
       var cartItems = JSON.parse(localStorage.getItem("cartItems"));
-      const existItem = cartItems.find((x) => x.id === product.id);
+      const existItem = cartItems.find((x) => x._id === product._id);
       // console.log(existItem.quantity);
       const quantity = existItem
         ? parseInt(existItem.quantity) + parseInt(addToCartQuantity)
@@ -67,7 +67,7 @@ function ProductPage(props) {
         return;
       }
       const index = cartItems
-        ? cartItems.findIndex((item) => item.id === product.id)
+        ? cartItems.findIndex((item) => item._id === product._id)
         : 0;
       cartItems[index] = {
         quantity: quantity,

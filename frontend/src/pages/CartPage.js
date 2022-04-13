@@ -19,6 +19,7 @@ function CartPage(props) {
   const [message, setmessage] = useState("");
   const currency = useSelector((state) => state.currency.currency);
   const userInfo = useSelector((state) => state.userInfo);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
 
   useEffect(() => {
     if (localStorage.getItem("cartItems") != null) {
@@ -27,6 +28,103 @@ function CartPage(props) {
       );
     }
   }, []);
+
+  useEffect(() => {}, [cartItems]);
+
+  const reducequantity = async (_id) => {
+    setmessage("");
+    axios.get("/api/products/id/" + _id).then((response) => {
+      //update the state with the response data
+      if (!isLoggedIn) {
+        setmessage("You must be logged in to add items to cart.");
+      } else if (localStorage.getItem("cartItems") != null) {
+        var cartItems = JSON.parse(localStorage.getItem("cartItems"));
+        const existItem = cartItems.find((x) => x._id === response.data._id);
+        const quantity = parseInt(existItem.quantity) - 1;
+        console.log(quantity);
+        const index = cartItems
+          ? cartItems.findIndex((item) => item.id === response.data.id)
+          : 0;
+        if (quantity > 0) {
+          cartItems[index] = {
+            quantity: quantity,
+            ...response.data,
+          };
+          localStorage.setItem("cartItems", JSON.stringify(cartItems));
+          if (localStorage.getItem("cartItems") != null) {
+            setcartitems(JSON.parse(localStorage.getItem("cartItems")));
+          }
+        } else {
+          var newArray = JSON.parse(localStorage.getItem("cartItems")).filter(
+            function (element) {
+              return element._id !== response.data._id;
+            }
+          );
+          localStorage.setItem("cartItems", newArray);
+          if (localStorage.getItem("cartItems") === "") {
+            localStorage.removeItem("cartItems");
+          }
+          if (localStorage.getItem("cartItems") != null) {
+            setcartitems(JSON.parse(localStorage.getItem("cartItems")));
+          } else {
+            setcartitems([]);
+          }
+        }
+      }
+    });
+  };
+
+  const addquantity = async (_id) => {
+    setmessage("");
+    axios.get("/api/products/id/" + _id).then((response) => {
+      //update the state with the response data
+      if (!isLoggedIn) {
+        setmessage("You must be logged in to add items to cart.");
+      } else if (localStorage.getItem("cartItems") != null) {
+        var cartItems = JSON.parse(localStorage.getItem("cartItems"));
+        const existItem = cartItems.find((x) => x._id === response.data._id);
+        const quantity = parseInt(existItem.quantity) + 1;
+        console.log(response.data.instock);
+        const index = cartItems
+          ? cartItems.findIndex((item) => item.id === response.data.id)
+          : 0;
+        if (quantity <= response.data.instock) {
+          cartItems[index] = {
+            quantity: quantity,
+            ...response.data,
+          };
+          localStorage.setItem("cartItems", JSON.stringify(cartItems));
+          if (localStorage.getItem("cartItems") != null) {
+            setcartitems(JSON.parse(localStorage.getItem("cartItems")));
+          }
+        } else {
+          setmessage(
+            "More quantity of " + response.data.name + " are not available."
+          );
+        }
+      }
+    });
+  };
+
+  const removeProduct = async (_id) => {
+    setmessage("");
+    axios.get("/api/products/id/" + _id).then((response) => {
+      var newArray = JSON.parse(localStorage.getItem("cartItems")).filter(
+        function (element) {
+          return element._id !== response.data._id;
+        }
+      );
+      localStorage.setItem("cartItems", newArray);
+      if (localStorage.getItem("cartItems") === "") {
+        localStorage.removeItem("cartItems");
+      }
+      if (localStorage.getItem("cartItems") != null) {
+        setcartitems(JSON.parse(localStorage.getItem("cartItems")));
+      } else {
+        setcartitems([]);
+      }
+    });
+  };
 
   const checkoutHandler = (e) => {
     if (
@@ -86,7 +184,7 @@ function CartPage(props) {
           <ListGroup>
             <ListGroupItem>
               <Row>
-                <Col md={6}>
+                <Col md={5}>
                   <h5>Item</h5>
                 </Col>
                 <Col md={2}>
@@ -98,13 +196,14 @@ function CartPage(props) {
                 <Col md={2}>
                   <h5>Total Price</h5>
                 </Col>
+                <Col md={1}></Col>
               </Row>
             </ListGroupItem>
 
             {cartItems.map((item) => (
               <ListGroup.Item key={item._id}>
                 <Row className="align-items-center">
-                  <Col md={6}>
+                  <Col md={5}>
                     <img
                       src={item.image}
                       alt={item.name}
@@ -114,7 +213,19 @@ function CartPage(props) {
                     <Link to={`/product/${item._id}`}>{item.name}</Link>
                   </Col>
                   <Col md={2}>
+                    <Button
+                      onClick={() => reducequantity(item._id)}
+                      variant="outline-primary"
+                    >
+                      -
+                    </Button>{" "}
                     <span>{item.quantity}</span>{" "}
+                    <Button
+                      onClick={() => addquantity(item._id)}
+                      variant="outline-primary"
+                    >
+                      +
+                    </Button>
                   </Col>
                   <Col md={2}>
                     {currency} {item.price}
@@ -122,6 +233,17 @@ function CartPage(props) {
                   <Col md={2}>
                     {currency}{" "}
                     {parseFloat(item.price * item.quantity).toFixed(2)}
+                  </Col>
+                  <Col md={1}>
+                    <span class="bi bi-trash"></span>
+
+                    <Button
+                      onClick={() => removeProduct(item._id)}
+                      variant="outline-primary"
+                      class="bi bi-trash"
+                    >
+                      <span class="bi bi-trash"></span>
+                    </Button>
                   </Col>
                 </Row>
                 <Row>
