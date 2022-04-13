@@ -30,9 +30,9 @@ function CartPage(props) {
 
   const checkoutHandler = (e) => {
     if (
-      userInfo[0].country === "" ||
-      userInfo[0].city === "" ||
-      userInfo[0].address === ""
+      userInfo.country === "" ||
+      userInfo.city === "" ||
+      userInfo.address === ""
     ) {
       setmessage("Please update your full address in your profile.");
       return;
@@ -102,7 +102,7 @@ function CartPage(props) {
             </ListGroupItem>
 
             {cartItems.map((item) => (
-              <ListGroup.Item key={item.id}>
+              <ListGroup.Item key={item._id}>
                 <Row className="align-items-center">
                   <Col md={6}>
                     <img
@@ -111,7 +111,7 @@ function CartPage(props) {
                       className="img-fluid rounded img-thumbnail"
                       style={{ width: "70px", height: "70px" }}
                     ></img>{" "}
-                    <Link to={`/product/${item.id}`}>{item.name}</Link>
+                    <Link to={`/product/${item._id}`}>{item.name}</Link>
                   </Col>
                   <Col md={2}>
                     <span>{item.quantity}</span>{" "}

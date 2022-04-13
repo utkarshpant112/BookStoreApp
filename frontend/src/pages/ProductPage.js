@@ -39,7 +39,7 @@ function ProductPage(props) {
   };
 
   const addToCartHandler = async () => {
-    if (!cookie.load("cookie")) {
+    if (cookie.load("cookie")) {
       setMessage("You must be logged in to add items to cart.");
     } else if (product.shopname === localStorage.getItem("shopname")) {
       setMessage("You cannot add your own item to your cart");
