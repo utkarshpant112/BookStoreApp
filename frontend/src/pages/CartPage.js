@@ -43,7 +43,7 @@ function CartPage(props) {
         const quantity = parseInt(existItem.quantity) - 1;
         console.log(quantity);
         const index = cartItems
-          ? cartItems.findIndex((item) => item.id === response.data.id)
+          ? cartItems.findIndex((item) => item._id === response.data._id)
           : 0;
         if (quantity > 0) {
           cartItems[index] = {
@@ -60,7 +60,7 @@ function CartPage(props) {
               return element._id !== response.data._id;
             }
           );
-          localStorage.setItem("cartItems", newArray);
+          localStorage.setItem("cartItems", JSON.stringify(newArray));
           if (localStorage.getItem("cartItems") === "") {
             localStorage.removeItem("cartItems");
           }
@@ -86,7 +86,7 @@ function CartPage(props) {
         const quantity = parseInt(existItem.quantity) + 1;
         console.log(response.data.instock);
         const index = cartItems
-          ? cartItems.findIndex((item) => item.id === response.data.id)
+          ? cartItems.findIndex((item) => item._id === response.data._id)
           : 0;
         if (quantity <= response.data.instock) {
           cartItems[index] = {
@@ -114,7 +114,7 @@ function CartPage(props) {
           return element._id !== response.data._id;
         }
       );
-      localStorage.setItem("cartItems", newArray);
+      localStorage.setItem("cartItems", JSON.stringify(newArray));
       if (localStorage.getItem("cartItems") === "") {
         localStorage.removeItem("cartItems");
       }
