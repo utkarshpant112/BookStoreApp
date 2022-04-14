@@ -16,6 +16,8 @@ router.post("/createorder", function (req, res) {
     image: req.body.image,
     customeremail: req.body.email,
     shopname: req.body.shopname,
+    isgiftwrapped: req.body.isgiftwrapped,
+    description: req.body.description,
   });
 
   newOrder.save((error, data) => {

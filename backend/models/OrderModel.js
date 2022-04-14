@@ -11,6 +11,8 @@ var orderSchema = new Schema(
     customeremail: { type: String, required: true },
     currency: { type: String, required: true },
     shopname: { type: String, required: true },
+    isgiftwrapped: { type: String, required: true },
+    description: { type: String, default: "" },
     image: {
       type: String,
       required: true,

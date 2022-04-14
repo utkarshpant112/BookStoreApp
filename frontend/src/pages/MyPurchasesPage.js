@@ -21,13 +21,6 @@ function MuPurchasesPage(props) {
       <>
         {currentOrders.map((order) => (
           <ListGroup.Item key={order.id}>
-            <Row>
-              <span>
-                {" "}
-                {"Order id:  "}
-                {order._id}
-              </span>
-            </Row>
             <Row className="align-items-center">
               <Col md={4}>
                 <img
@@ -51,6 +44,17 @@ function MuPurchasesPage(props) {
               </Col>
               <Col md={2}>
                 <span>{order.dateofpurchase}</span>{" "}
+              </Col>
+            </Row>
+            <Row>
+              <Col md={8}>
+                <div
+                  class={
+                    order.isgiftwrapped === "true" ? "visible" : "invisible"
+                  }
+                >
+                  <span>Order is gift wrapped : {order.description}</span>
+                </div>
               </Col>
             </Row>
           </ListGroup.Item>

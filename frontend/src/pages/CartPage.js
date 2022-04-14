@@ -15,6 +15,8 @@ import { useSelector } from "react-redux";
 
 function CartPage(props) {
   const navigate = useNavigate();
+  const [checked, setChecked] = useState(false);
+  const [text, setText] = useState("");
   const [cartItems, setcartitems] = useState([]);
   const [message, setmessage] = useState("");
   const currency = useSelector((state) => state.currency.currency);
@@ -149,6 +151,8 @@ function CartPage(props) {
         quantity: item.quantity,
         date: new Date().toLocaleDateString(),
         email: localStorage.getItem("email"),
+        isgiftwrapped: checked,
+        description: text,
       };
 
       axios.defaults.withCredentials = true;
@@ -251,18 +255,37 @@ function CartPage(props) {
                   </Col>
                 </Row>
                 <Row>
-                  <Col md={4}>
-                    <Form>
-                      {["checkbox"].map((type) => (
-                        <div key={`default-${type}`} className="mb-3">
-                          <Form.Check
-                            type={type}
-                            id={`default-${type}`}
-                            label="Gift wrap the item"
+                  <Col md={9}>
+                    <Row>
+                      <Col md={5}>
+                        <label>
+                          Gift wrap your item{" "}
+                          <input
+                            name="checkbox"
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              if (checked) {
+                                setText("");
+                              }
+                              setChecked(!checked);
+                            }}
                           />
-                        </div>
-                      ))}
-                    </Form>
+                        </label>
+                      </Col>
+                      <Col md={4}>
+                        {" "}
+                        <label>
+                          <input
+                            name="input"
+                            type="text"
+                            disabled={!checked}
+                            value={text}
+                            onChange={(e) => setText(e.target.value)}
+                          />
+                        </label>
+                      </Col>
+                    </Row>
                   </Col>
                 </Row>
               </ListGroup.Item>
