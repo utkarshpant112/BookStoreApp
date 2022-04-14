@@ -235,14 +235,18 @@ function CartPage(props) {
                     {parseFloat(item.price * item.quantity).toFixed(2)}
                   </Col>
                   <Col md={1}>
-                    <span class="bi bi-trash"></span>
-
                     <Button
                       onClick={() => removeProduct(item._id)}
                       variant="outline-primary"
-                      class="bi bi-trash"
                     >
-                      <span class="bi bi-trash"></span>
+                      <img
+                        src="/images/trash.png"
+                        style={{
+                          position: "sticky",
+                          height: "25px",
+                          width: "25px",
+                        }}
+                      />
                     </Button>
                   </Col>
                 </Row>
