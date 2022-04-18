@@ -150,7 +150,7 @@ function CartPage(props) {
         currency: currency,
         quantity: item.quantity,
         date: new Date().toLocaleDateString(),
-        email: localStorage.getItem("email"),
+        email: userInfo.email,
         isgiftwrapped: checked,
         description: text,
       };

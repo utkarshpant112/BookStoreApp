@@ -8,9 +8,8 @@ import ListGroup from "react-bootstrap/ListGroup";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import { Helmet } from "react-helmet-async";
-import { Navigate, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
-import cookie from "react-cookies";
 import FavoriteModal from "../components/FavoriteModal";
 import { useSelector } from "react-redux";
 
@@ -22,6 +21,8 @@ function ProductPage(props) {
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
   const currency = useSelector((state) => state.currency.currency);
+  const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const userInfo = useSelector((state) => state.userInfo);
 
   useEffect(() => {
     console.log(id);
@@ -39,9 +40,9 @@ function ProductPage(props) {
   };
 
   const addToCartHandler = async () => {
-    if (cookie.load("cookie")) {
+    if (!isLoggedIn) {
       setMessage("You must be logged in to add items to cart.");
-    } else if (product.shopname === localStorage.getItem("shopname")) {
+    } else if (product.shopname === userInfo.shopname) {
       setMessage("You cannot add your own item to your cart");
     } else if (setaddToCartQuantity < 1) {
       setMessage("Please enter a valid quantity.");

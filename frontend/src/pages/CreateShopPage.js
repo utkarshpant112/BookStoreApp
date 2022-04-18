@@ -1,6 +1,5 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import cookie from "react-cookies";
 import { Navigate } from "react-router";
 import Button from "react-bootstrap/Button";
 import { useSelector } from "react-redux";
@@ -8,6 +7,7 @@ import { useSelector } from "react-redux";
 //Define a Create Shop Component
 function CreateShopPage(props) {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const userInfo = useSelector((state) => state.userInfo);
   const [shopname, setShopname] = useState("");
   const [shopcreated, setShopcreated] = useState(false);
   const [message, setMessage] = useState(undefined);
@@ -20,9 +20,9 @@ function CreateShopPage(props) {
 
   useEffect(() => {
     const data = {
-      email: localStorage.getItem("email"),
+      email: userInfo.email,
     };
-    if (localStorage.getItem("email") != null) {
+    if (userInfo != null) {
       axios
         .post("/api/shop/isshopalreadycreated", data)
         .then((response) => {
@@ -71,7 +71,7 @@ function CreateShopPage(props) {
     e.preventDefault();
     const data = {
       shopname: shopname,
-      email: localStorage.getItem("email"),
+      email: userInfo.email,
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;

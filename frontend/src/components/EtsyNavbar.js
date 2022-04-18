@@ -1,36 +1,25 @@
 import Navbar from "react-bootstrap/Navbar";
 import Container from "react-bootstrap/Container";
 import { LinkContainer } from "react-router-bootstrap";
-import Badge from "react-bootstrap/Badge";
 import Nav from "react-bootstrap/Nav";
-import { Component, useContext, useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import cookie from "react-cookies";
-import { Navigate, withRouter } from "react-router";
 import SearchBox from "./Searchbox";
 import LoginModal from "./LoginModal";
-import Button from "react-bootstrap/Button";
 import { useDispatch, useSelector } from "react-redux";
-import { logout, signin, signout } from "../actions/userActions";
-import { connect } from "react-redux";
-import axios from "axios";
-import {
-  getAllProductsaction,
-  setproductaction,
-} from "../actions/productactions";
+import { logout } from "../actions/userActions";
+import { getAllProductsaction } from "../actions/productactions";
 
 function EtsyNavbar(props) {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const userInfo = useSelector((state) => state.userInfo);
   const dispatch = useDispatch();
 
-  //handle logout to destroy the cookie
+  //handle logout
   const handleLogout = (e) => {
     console.log("Inside logout");
     dispatch(logout());
     dispatch(getAllProductsaction());
-    cookie.remove("cookie", { path: "/" });
   };
 
   return (

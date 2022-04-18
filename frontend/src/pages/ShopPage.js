@@ -20,6 +20,7 @@ const ShopPage = (props) => {
   const [message, setMessage] = useState("");
   const [salescount, setsalescount] = useState("");
   const [products, setProducts] = useState([]);
+  const userInfo = useSelector((state) => state.userInfo);
   const shopPageProductsUpdated = useSelector(
     (state) => state.shopPageProductsUpdated
   );
@@ -29,7 +30,7 @@ const ShopPage = (props) => {
     axios.get("/api/user/ownerdetails/" + shopname).then((response) => {
       //update the state with the response data
       setOwner(response.data);
-      if (response.data.email === localStorage.getItem("email")) {
+      if (response.data.email === userInfo.email) {
         setMessage("Shop owner viewing");
       }
     });

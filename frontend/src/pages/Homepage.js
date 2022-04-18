@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import axios from "axios";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Product from "../components/Product";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation } from "react-router";
 import {
   getAllProductsaction,
   getOtherSellerProductsaction,

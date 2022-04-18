@@ -9,10 +9,12 @@ import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
 import ReactPaginate from "react-paginate";
 
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 function MuPurchasesPage(props) {
   const [orders, setOrders] = useState([]);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const userInfo = useSelector((state) => state.userInfo);
 
   function Orders({ currentOrders }) {
     return currentOrders === null ? (
@@ -124,12 +126,10 @@ function MuPurchasesPage(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      axios
-        .get("/api//order/" + localStorage.getItem("email"))
-        .then((response) => {
-          //update the state with the response data
-          setOrders(response.data);
-        });
+      axios.get("/api//order/" + userInfo.email).then((response) => {
+        //update the state with the response data
+        setOrders(response.data);
+      });
     }, 10);
   }, []);
 

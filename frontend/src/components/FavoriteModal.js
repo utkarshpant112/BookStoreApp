@@ -8,6 +8,7 @@ import { favoritesupdated } from "../actions/favoritesaction";
 export default function FavoriteModal(props) {
   const [show, setShow] = useState(props.show);
   const handleShow = () => setShow(true);
+  const userInfo = useSelector((state) => state.userInfo);
   const [message, setMessage] = useState("");
 
   const dispatch = useDispatch();
@@ -21,10 +22,9 @@ export default function FavoriteModal(props) {
 
   //submit Login handler to send a request to the node backend
   const favoritebuttonclick = (e) => {
-    if (localStorage.getItem("email") === null) {
-      console.log(localStorage.getItem("email"));
+    if (userInfo === null) {
       setMessage("Please login first.");
-    } else if (localStorage.getItem("shopname") === props.shopname) {
+    } else if (userInfo.shopname === props.shopname) {
       setMessage("You cannot add your own item to your favorites");
     } else {
       //prevent page from refresh
@@ -33,7 +33,7 @@ export default function FavoriteModal(props) {
       const data = {
         name: props.name,
         shopname: props.shopname,
-        email: localStorage.getItem("email"),
+        email: userInfo.email,
       };
       //set the with credentials to true
       axios.defaults.withCredentials = true;

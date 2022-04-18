@@ -1,6 +1,5 @@
 import React, { Component, useEffect, useState } from "react";
 import axios from "axios";
-import cookie from "react-cookies";
 import { Navigate } from "react-router";
 import Select from "react-select";
 import Card from "react-bootstrap/Card";
@@ -32,7 +31,7 @@ function ProfilePage(props) {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    let useremail = localStorage.getItem("email");
+    let useremail = userInfo.email;
     axios.get("/api/user/userprofile/" + useremail).then((response) => {
       setName(response.data.name);
       setDob(response.data.dob);

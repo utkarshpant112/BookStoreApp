@@ -18,6 +18,7 @@ const FavoritesPage = () => {
   const [refresh, setRefresh] = useState("");
   const [products, setProducts] = useState([]);
   const [filteredproducts, setfilteredProducts] = useState([]);
+  const userInfo = useSelector((state) => state.userInfo);
   const favoriteProductsUpdated = useSelector(
     (state) => state.favoritesupdated
   );
@@ -44,7 +45,7 @@ const FavoritesPage = () => {
   };
 
   useEffect(() => {
-    let useremail = localStorage.getItem("email");
+    let useremail = userInfo.email;
     axios.get("/api/user/userprofile/" + useremail).then((response) => {
       setUser(response.data);
     });

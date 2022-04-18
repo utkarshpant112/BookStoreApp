@@ -114,7 +114,7 @@ export default function SearchPage(props) {
   const pricing = async (price) => {
     var email = "";
     if (userInfo !== null) {
-      email = userInfo[0].email;
+      email = userInfo.email;
     }
     switch (price) {
       case "first":
