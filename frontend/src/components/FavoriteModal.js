@@ -57,7 +57,7 @@ export default function FavoriteModal(props) {
     handleShow();
     setTimeout(() => {
       handleClose();
-    }, 500);
+    }, 700);
   };
 
   return (

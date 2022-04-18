@@ -125,12 +125,10 @@ function MuPurchasesPage(props) {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      axios.get("/api//order/" + userInfo.email).then((response) => {
-        //update the state with the response data
-        setOrders(response.data);
-      });
-    }, 10);
+    axios.get("/api//order/" + userInfo.email).then((response) => {
+      //update the state with the response data
+      setOrders(response.data);
+    });
   }, []);
 
   return orders.length === 0 ? (

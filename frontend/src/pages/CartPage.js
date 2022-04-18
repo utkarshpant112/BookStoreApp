@@ -157,19 +157,20 @@ function CartPage(props) {
 
       axios.defaults.withCredentials = true;
       //make a post request with the user data
-      axios.post("/api/order/createorder", data).then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200 && response.data === "order Created") {
-          setmessage("Order Created");
-          localStorage.removeItem("cartItems");
-        } else {
-          setmessage(response.data);
-          localStorage.removeItem("cartItems");
-        }
-      });
+      axios
+        .post("/api/order/createorder", data)
+        .then((response) => {
+          console.log("Status Code : ", response.status);
+          if (response.status === 200 && response.data === "order Created") {
+            setmessage("Order Created");
+            localStorage.removeItem("cartItems");
+          } else {
+            setmessage(response.data);
+            localStorage.removeItem("cartItems");
+          }
+        })
+        .then(navigate("/mypurchases"));
     });
-    localStorage.removeItem("cartItems");
-    navigate("/mypurchases");
   };
 
   return cartItems.length === 0 ? (
