@@ -32,6 +32,8 @@ function ProfilePage(props) {
 
   useEffect(() => {
     let useremail = userInfo.email;
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.get("/api/user/userprofile/" + useremail).then((response) => {
       setName(response.data.name);
       setDob(response.data.dob);
@@ -134,6 +136,8 @@ function ProfilePage(props) {
       //set the with credentials to true
       axios.defaults.withCredentials = true;
       //make a post request with the user data
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/user/updateprofile", data)
         .then((response) => {

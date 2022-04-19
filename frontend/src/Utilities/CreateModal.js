@@ -121,6 +121,8 @@ export default function CreateModal(props) {
       //set the with credentials to true
       axios.defaults.withCredentials = true;
       //make a post request with the user data
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/products/addproduct", data)
         .then((response) => {

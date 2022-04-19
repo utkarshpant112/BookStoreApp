@@ -155,6 +155,8 @@ export default function EditModal(props) {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.post("/api/products/updateproduct", data).then((response) => {
       console.log("Status Code : ", response.status);
       if (response.status === 200 && response.data === "Product Updated") {

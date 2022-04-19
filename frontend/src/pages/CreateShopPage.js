@@ -23,6 +23,8 @@ function CreateShopPage(props) {
       email: userInfo.email,
     };
     if (userInfo != null) {
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/shop/isshopalreadycreated", data)
         .then((response) => {
@@ -50,6 +52,8 @@ function CreateShopPage(props) {
       //set the with credentials to true
       axios.defaults.withCredentials = true;
       //make a post request with the user data
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/shop/shopNameAvailable", data)
         .then((response) => {
@@ -75,7 +79,8 @@ function CreateShopPage(props) {
     };
     //set the with credentials to true
     axios.defaults.withCredentials = true;
-
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios
       .post("/api/shop/createshop", data)
       .then((response) => {

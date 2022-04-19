@@ -38,6 +38,8 @@ export default function FavoriteModal(props) {
       //set the with credentials to true
       axios.defaults.withCredentials = true;
       //make a post request with the user data
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/favorite/addtofavorites", data)
         .then((response) => {

@@ -157,6 +157,8 @@ function CartPage(props) {
 
       axios.defaults.withCredentials = true;
       //make a post request with the user data
+      axios.defaults.headers.common["authorization"] =
+        localStorage.getItem("token");
       axios
         .post("/api/order/createorder", data)
         .then((response) => {

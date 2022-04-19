@@ -1,5 +1,6 @@
 import axios from "axios";
 import validator from "validator";
+import jwt_decode from "jwt-decode";
 
 import {
   USER_LOGIN_FAIL,
@@ -31,13 +32,15 @@ export const login = (email, password) => async (dispatch) => {
         console.log("Status Code : ", response.status);
         console.log("Status data : ", response.data);
         if (response.status === 200) {
-          console.log(response.data);
-          dispatch({ type: USER_LOGIN_SUCCESS, payload: response.data });
+          localStorage.setItem("token", response.data);
+
+          var decoded = jwt_decode(response.data.split(" ")[1]);
+          dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded });
         }
         return "";
       })
       .catch((error) => {
-        console.log(error.response.data);
+        console.log(error);
         dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
         return error.response.data;
       });
@@ -72,6 +75,7 @@ export const signup = (name, email, password) => async (dispatch) => {
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {
+          localStorage.setItem("token", response.data);
           dispatch({ type: USER_SIGNUP_SUCCESS, payload: response.data });
           return "";
         }

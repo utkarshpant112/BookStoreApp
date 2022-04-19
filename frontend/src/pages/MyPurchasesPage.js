@@ -125,6 +125,8 @@ function MuPurchasesPage(props) {
   }
 
   useEffect(() => {
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.get("/api//order/" + userInfo.email).then((response) => {
       //update the state with the response data
       setOrders(response.data);

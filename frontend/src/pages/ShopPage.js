@@ -40,6 +40,8 @@ const ShopPage = (props) => {
     axios.get("/api/products/shopproducts/" + shopname).then((response) => {
       setProducts(response.data);
     });
+    axios.defaults.headers.common["authorization"] =
+      localStorage.getItem("token");
     axios.get("/api/shop/shopsalestotal/" + shopname).then((response) => {
       setsalescount(response.data);
     });
@@ -67,6 +69,8 @@ const ShopPage = (props) => {
           //set the with credentials to true
           axios.defaults.withCredentials = true;
           //make a post request with the user data
+          axios.defaults.headers.common["authorization"] =
+            localStorage.getItem("token");
           axios.post("/api/shop/addshopimage", data).then((response) => {
             console.log("Status Code : ", response.status);
           });
