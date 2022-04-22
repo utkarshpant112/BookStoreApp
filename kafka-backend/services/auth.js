@@ -1,4 +1,3 @@
-const router = require("express").Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const Users = require("../models/UserModel");
@@ -6,25 +5,21 @@ const { secret } = require("../config");
 const { auth } = require("../utils/passport");
 auth();
 
-//Route to handle Login Post Request Call
-router.post("/login", function (req, res) {
+login = async (msg, callback) => {
   console.log("Inside Login Post Request");
-  console.log("Req Body : ", req.body);
-  let password = req.body.password;
-  Users.findOne({ email: req.body.email }, (error, user) => {
+  console.log("Msg Body : ", msg.body);
+  let password = msg.body.password;
+  let res = {};
+  Users.findOne({ email: msg.body.email }, (error, user) => {
     if (error) {
       console.log(error);
-      res.writeHead(500, {
-        "Content-Type": "text/plain",
-      });
-      res.end();
+      res.status = 500;
+      res.data = "Error in connecting to mongo";
+      callback(null, res);
     }
     if (user) {
       bcrypt.compare(password, user.password, function (err, answer) {
         if (answer) {
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
           const payload = {
             _id: user._id,
             name: user.name,
@@ -41,71 +36,67 @@ router.post("/login", function (req, res) {
           const token = jwt.sign(payload, secret, {
             expiresIn: 1008000,
           });
-          res.status(200).end("JWT " + token);
+          res.status = 200;
+          res.data = "JWT " + token;
+          callback(null, res);
         } else {
-          res.writeHead(401, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Incorrect Password");
+          res.status = 401;
+          callback(null, res);
         }
       });
     } else {
-      res.end("Email is not registered with us");
+      res.status = 401;
+      res.data = "Email is not registered with us";
+      callback(null, res);
     }
   });
-});
+};
 
-//Route to handle SignUp Post Request Call
-router.post("/signup", async function (req, res) {
+signup = async (msg, callback) => {
   console.log("Inside Signup Post Request");
-  console.log("Req Body : ", req.body);
-  let password = req.body.password;
+  console.log("Msg Body : ", msg.body);
+  let password = msg.body.password;
+  let res = {};
   bcrypt.genSalt(10, function (err, Salt) {
     // The bcrypt is used for encrypting password.
     bcrypt.hash(password, Salt, function (err, hash) {
       if (err) {
-        return console.log("Cannot encrypt");
+        res.status = 500;
+        res.data = "Cannot encrypt";
+        callback(null, res);
       }
       hashedPassword = hash;
       console.log(hashedPassword);
       var newUser = new Users({
-        name: req.body.name,
-        email: req.body.email,
+        name: msg.body.name,
+        email: msg.body.email,
         password: hashedPassword,
       });
-      Users.findOne({ email: req.body.email }, (error, user) => {
+      Users.findOne({ email: msg.body.email }, (error, user) => {
         if (error) {
           console.log(error);
-          res.writeHead(500, {
-            "Content-Type": "text/plain",
-          });
-          res.end();
+          res.status = 500;
+          res.data = "Error";
+          callback(null, res);
         }
         if (user) {
-          res.writeHead(400, {
-            "Content-Type": "text/plain",
-          });
-          res.end("User already exists");
+          res.status = 400;
+          res.data = "User already exists";
+          callback(null, res);
         } else {
           newUser.save((error, data) => {
             if (error) {
-              res.writeHead(500, {
-                "Content-Type": "text/plain",
-              });
-              res.end();
+              res.status = 500;
+              res.data = "Error";
+              callback(null, res);
             } else {
-              Users.findOne({ email: req.body.email }, (error, user) => {
+              Users.findOne({ email: msg.body.email }, (error, user) => {
                 if (error) {
-                  console.log(error);
-                  res.writeHead(500, {
-                    "Content-Type": "text/plain",
-                  });
-                  res.end();
+                  res.status = 500;
+                  res.data = "Error";
+                  callback(null, res);
                 }
                 if (user) {
-                  res.writeHead(200, {
-                    "Content-Type": "text/plain",
-                  });
                   const payload = {
                     _id: user._id,
                     name: user.name,
@@ -122,9 +113,13 @@ router.post("/signup", async function (req, res) {
                   const token = jwt.sign(payload, secret, {
                     expiresIn: 1008000,
                   });
-                  res.status(200).end("JWT " + token);
+                  res.status = 200;
+                  res.data = "JWT " + token;
+                  callback(null, res);
                 } else {
-                  res.end("Error in signing up");
+                  res.status = 400;
+                  res.data = "Error in signing up";
+                  callback(null, res);
                 }
               });
             }
@@ -133,6 +128,15 @@ router.post("/signup", async function (req, res) {
       });
     });
   });
-});
+};
 
-module.exports = router;
+function handle_request(msg, callback) {
+  console.log(msg);
+  if (msg.path === "login") {
+    login(msg, callback);
+  } else if (msg.path === "signup") {
+    signup(msg, callback);
+  }
+}
+
+exports.handle_request = handle_request;

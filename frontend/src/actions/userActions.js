@@ -76,7 +76,8 @@ export const signup = (name, email, password) => async (dispatch) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200) {
           localStorage.setItem("token", response.data);
-          dispatch({ type: USER_SIGNUP_SUCCESS, payload: response.data });
+          var decoded = jwt_decode(response.data.split(" ")[1]);
+          dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded });
           return "";
         }
       })

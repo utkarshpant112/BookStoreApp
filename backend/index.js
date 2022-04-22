@@ -57,7 +57,7 @@ mongoose.connect(mongoDB, options, (err, res) => {
   }
 });
 
-const authRoute = require("./mongoRoutes/auth");
+const authRoute = require("./kafkaRoutes/auth");
 const productRoute = require("./mongoRoutes/product");
 const userRoute = require("./mongoRoutes/user");
 const shopRoute = require("./mongoRoutes/shop");
