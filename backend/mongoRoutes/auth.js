@@ -1,8 +1,11 @@
 const router = require("express").Router();
-var mysql = require("mysql");
 const pool = require("../db");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const Users = require("../models/UserModel");
+const { secret } = require("../config");
+const { auth } = require("../utils/passport");
+auth();
 
 //Route to handle Login Post Request Call
 router.post("/login", function (req, res) {
@@ -23,9 +26,23 @@ router.post("/login", function (req, res) {
           res.writeHead(200, {
             "Content-Type": "text/plain",
           });
-          user.password = "*****";
-          user._id = "*****";
-          res.end(JSON.stringify(user));
+          const payload = {
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            shopname: user.shopname,
+            dob: user.dob,
+            country: user.country,
+            address: user.address,
+            city: user.city,
+            about: user.about,
+            pic: user.pic,
+            phone: user.phone,
+          };
+          const token = jwt.sign(payload, secret, {
+            expiresIn: 1008000,
+          });
+          res.status(200).end("JWT " + token);
         } else {
           res.writeHead(401, {
             "Content-Type": "text/plain",
@@ -78,11 +95,39 @@ router.post("/signup", async function (req, res) {
               });
               res.end();
             } else {
-              res.writeHead(200, {
-                "Content-Type": "text/plain",
+              Users.findOne({ email: req.body.email }, (error, user) => {
+                if (error) {
+                  console.log(error);
+                  res.writeHead(500, {
+                    "Content-Type": "text/plain",
+                  });
+                  res.end();
+                }
+                if (user) {
+                  res.writeHead(200, {
+                    "Content-Type": "text/plain",
+                  });
+                  const payload = {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    shopname: user.shopname,
+                    dob: user.dob,
+                    country: user.country,
+                    address: user.address,
+                    city: user.city,
+                    about: user.about,
+                    pic: user.pic,
+                    phone: user.phone,
+                  };
+                  const token = jwt.sign(payload, secret, {
+                    expiresIn: 1008000,
+                  });
+                  res.status(200).end("JWT " + token);
+                } else {
+                  res.end("Error in signing up");
+                }
               });
-              newUser.password = "*****";
-              res.end(JSON.stringify(newUser));
             }
           });
         }

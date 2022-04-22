@@ -6,6 +6,7 @@ var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
+var kafka = require("./kafka/client");
 const router = require("express").Router();
 
 app.set("view engine", "ejs");

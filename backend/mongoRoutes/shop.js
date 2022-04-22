@@ -4,8 +4,10 @@ const pool = require("../db");
 const Shop = require("../models/ShopModel");
 const Users = require("../models/UserModel");
 const Products = require("../models/ProductModel");
+const { checkAuth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 
-router.post("/shopNameAvailable", function (req, res) {
+router.post("/shopNameAvailable", checkAuth, function (req, res) {
   console.log("Inside Shop name available");
   Shop.findOne({ shopname: req.body.shopname }, (error, shop) => {
     if (error) {
@@ -29,7 +31,7 @@ router.post("/shopNameAvailable", function (req, res) {
   });
 });
 
-router.post("/isshopalreadycreated", function (req, res) {
+router.post("/isshopalreadycreated", checkAuth, function (req, res) {
   console.log("Inside isshopalreadycreated");
   Shop.findOne({ email: req.body.email }, (error, shop) => {
     if (error) {
@@ -53,7 +55,7 @@ router.post("/isshopalreadycreated", function (req, res) {
   });
 });
 
-router.post("/createshop", function (req, res) {
+router.post("/createshop", checkAuth, function (req, res) {
   console.log("Inside Create shop");
   Shop.findOne({ shopname: req.body.shopname }, (error, shop) => {
     if (error) {
@@ -109,7 +111,7 @@ router.post("/createshop", function (req, res) {
   });
 });
 
-router.post("/addshopimage", function (req, res) {
+router.post("/addshopimage", checkAuth, function (req, res) {
   console.log("Inside Update Shop Pic Post Request");
   console.log("Req Body : ", req.body);
   Shop.findOneAndUpdate(
@@ -161,7 +163,7 @@ router.get("/shopimage/:shopname", function (req, res) {
   });
 });
 
-router.get("/shopsalestotal/:shopname", function (req, res) {
+router.get("/shopsalestotal/:shopname", checkAuth, function (req, res) {
   console.log("Inside Shopname products");
   const shopname = req.params.shopname;
 

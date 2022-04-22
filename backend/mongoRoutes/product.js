@@ -3,6 +3,8 @@ var mysql = require("mysql");
 const pool = require("../db");
 const Products = require("../models/ProductModel");
 const Categorys = require("../models/CategoryModel");
+const { checkAuth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 
 //Route to get All Products when user visits the Home Page
 router.get("/", function (req, res) {
@@ -28,7 +30,7 @@ router.get("/", function (req, res) {
   });
 });
 
-router.post("/addproduct", function (req, res) {
+router.post("/addproduct", checkAuth, function (req, res) {
   console.log("Inside add product");
 
   var newProducts = new Products({
@@ -74,7 +76,7 @@ router.post("/addproduct", function (req, res) {
   );
 });
 
-router.post("/updateproduct", function (req, res) {
+router.post("/updateproduct", checkAuth, function (req, res) {
   console.log("Inside update product");
   Products.findOneAndUpdate(
     { name: req.body.name },

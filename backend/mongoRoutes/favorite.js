@@ -3,8 +3,10 @@ var mysql = require("mysql");
 const pool = require("../db");
 const Favorites = require("../models/FavoritesModel");
 const Products = require("../models/ProductModel");
+const { checkAuth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 
-router.post("/addtofavorites", function (req, res) {
+router.post("/addtofavorites", checkAuth, function (req, res) {
   console.log("Inside add to favorites");
   Favorites.findOne(
     { name: req.body.name, shopname: req.body.shopname, email: req.body.email },
@@ -68,7 +70,7 @@ router.post("/addtofavorites", function (req, res) {
   );
 });
 
-router.get("/getfavoriteproducts/:email", function (req, res) {
+router.get("/getfavoriteproducts/:email", checkAuth, function (req, res) {
   console.log("Inside getfavoriteproducts");
   console.log(req.params.email);
 

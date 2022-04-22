@@ -3,8 +3,10 @@ var mysql = require("mysql");
 const pool = require("../db");
 const Orders = require("../models/OrderModel");
 const Products = require("../models/ProductModel");
+const { checkAuth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 
-router.post("/createorder", function (req, res) {
+router.post("/createorder", checkAuth, function (req, res) {
   console.log("Inside create order");
   console.log(req);
   var newOrder = new Orders({
@@ -56,7 +58,7 @@ router.post("/createorder", function (req, res) {
   });
 });
 
-router.get("/:email", function (req, res) {
+router.get("/:email", checkAuth, function (req, res) {
   console.log("Inside orders");
   const email = req.params.email;
   Orders.find({ customeremail: req.params.email }, (error, orders) => {

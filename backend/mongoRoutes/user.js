@@ -1,9 +1,12 @@
 const router = require("express").Router();
 var mysql = require("mysql");
 const pool = require("../db");
+const { checkAuth } = require("../utils/passport");
+const { auth } = require("../Utils/passport");
 const Users = require("../models/UserModel");
+auth();
 
-router.get("/userprofile/:email", function (req, res) {
+router.get("/userprofile/:email", checkAuth, function (req, res) {
   console.log("Inside profile get request");
   const email = req.params.email;
   Users.findOne({ email: req.params.email }, (error, user) => {
@@ -29,7 +32,7 @@ router.get("/userprofile/:email", function (req, res) {
 });
 
 //Route to handle Post Request Call
-router.post("/updateprofile", function (req, res) {
+router.post("/updateprofile", checkAuth, function (req, res) {
   console.log("Inside Update Profile Post Request");
   console.log("Req Body : ", req.body);
 
