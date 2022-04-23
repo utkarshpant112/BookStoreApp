@@ -1,11 +1,7 @@
 const router = require("express").Router();
-var mysql = require("mysql");
-const pool = require("../db");
 var kafka = require("../kafka/client");
 const { checkAuth } = require("../utils/passport");
 const { auth } = require("../Utils/passport");
-const Users = require("../models/UserModel");
-auth();
 
 router.get("/userprofile/:email", function (req, res) {
   msg = {};

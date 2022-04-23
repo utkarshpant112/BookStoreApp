@@ -35,34 +35,34 @@ app.use(function (req, res, next) {
   next();
 });
 
-const { mongoDB } = require("./config");
-const mongoose = require("mongoose");
-require("./models/UserModel");
-require("./models/ShopModel");
-require("./models/ProductModel");
-require("./models/CategoryModel");
+// const { mongoDB } = require("./config");
+// const mongoose = require("mongoose");
+// require("./models/UserModel");
+// require("./models/ShopModel");
+// require("./models/ProductModel");
+// require("./models/CategoryModel");
 
-var options = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  maxpoolSize: 500,
-};
+// var options = {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+//   maxpoolSize: 500,
+// };
 
-mongoose.connect(mongoDB, options, (err, res) => {
-  if (err) {
-    console.log(err);
-    console.log(`MongoDB Connection Failed`);
-  } else {
-    console.log(`MongoDB Connected`);
-  }
-});
+// mongoose.connect(mongoDB, options, (err, res) => {
+//   if (err) {
+//     console.log(err);
+//     console.log(`MongoDB Connection Failed`);
+//   } else {
+//     console.log(`MongoDB Connected`);
+//   }
+// });
 
 const authRoute = require("./kafkaRoutes/auth");
 const productRoute = require("./kafkaRoutes/product");
 const userRoute = require("./kafkaRoutes/user");
 const shopRoute = require("./kafkaRoutes/shop");
 const orderRoute = require("./kafkaRoutes/order");
-const favoriteRoute = require("./mongoRoutes/favorite");
+const favoriteRoute = require("./kafkaRoutes/favorite");
 
 app.use("/api/auth", authRoute);
 app.use("/api/products", productRoute);

@@ -7,6 +7,7 @@ var User = require("./services/user.js");
 var Product = require("./services/product.js");
 var Shop = require("./services/shop.js");
 var Order = require("./services/order.js");
+var Favorite = require("./services/favorite.js");
 
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
@@ -67,3 +68,4 @@ handleTopicRequest("user", User);
 handleTopicRequest("product", Product);
 handleTopicRequest("shop", Shop);
 handleTopicRequest("order", Order);
+handleTopicRequest("favorite", Favorite);

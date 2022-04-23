@@ -1,11 +1,7 @@
 const router = require("express").Router();
-var mysql = require("mysql");
-const pool = require("../db");
-const Orders = require("../models/OrderModel");
-const Products = require("../models/ProductModel");
 const { checkAuth } = require("../utils/passport");
-const { auth } = require("../Utils/passport");
 var kafka = require("../kafka/client");
+const { auth } = require("../Utils/passport");
 
 router.post("/createorder", checkAuth, function (req, res) {
   msg = {};

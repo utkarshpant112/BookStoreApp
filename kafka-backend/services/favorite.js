@@ -1,86 +1,73 @@
-const router = require("express").Router();
-var mysql = require("mysql");
-const pool = require("../db");
 const Favorites = require("../models/FavoritesModel");
 const Products = require("../models/ProductModel");
 const { checkAuth } = require("../utils/passport");
 const { auth } = require("../Utils/passport");
 
-router.post("/addtofavorites", checkAuth, function (req, res) {
-  console.log("Inside add to favorites");
+addtofavorites = async (msg, callback) => {
+  console.log("Inside getfavoriteproducts");
+  let res = {};
   Favorites.findOne(
-    { name: req.body.name, shopname: req.body.shopname, email: req.body.email },
+    { name: msg.body.name, shopname: msg.body.shopname, email: msg.body.email },
     (error, favorite) => {
       if (error) {
-        console.log(error);
-        res.writeHead(500, {
-          "Content-Type": "text/plain",
-        });
-        res.end();
+        res.status = 500;
+        res.data = "Internal Server Error";
+        callback(null, res);
       }
       if (favorite) {
         Favorites.deleteOne(
           {
-            name: req.body.name,
-            shopname: req.body.shopname,
-            email: req.body.email,
+            name: msg.body.name,
+            shopname: msg.body.shopname,
+            email: msg.body.email,
           },
           (error, favorite) => {
             if (error) {
-              console.log(error);
-              res.writeHead(500, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Unable to remove from favorites");
+              res.status = 500;
+              res.data = "Internal Server Error";
+              callback(null, res);
             }
             if (favorite) {
-              res.writeHead(400, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Removed from favorites");
+              res.status = 400;
+              res.data = "Removed from favorites";
+              callback(null, res);
             } else {
-              res.writeHead(400, {
-                "Content-Type": "text/plain",
-              });
-              res.end("Unable to remove from favorites");
+              res.status = 400;
+              res.data = "Unable to remove from favorites";
+              callback(null, res);
             }
           }
         );
       } else {
         var newFavorite = new Favorites({
-          name: req.body.name,
-          shopname: req.body.shopname,
-          email: req.body.email,
+          name: msg.body.name,
+          shopname: msg.body.shopname,
+          email: msg.body.email,
         });
         newFavorite.save((error, data) => {
           if (error) {
-            res.writeHead(500, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Unable to add to favorites");
+            res.status = 500;
+            res.data = "Unable to add to favorites";
+            callback(null, res);
           } else {
-            res.writeHead(200, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Added to favorites");
+            res.status = 200;
+            res.data = "Added to favorites";
+            callback(null, res);
           }
         });
       }
     }
   );
-});
+};
 
-router.get("/getfavoriteproducts/:email", checkAuth, function (req, res) {
+getfavoriteproducts = async (msg, callback) => {
   console.log("Inside getfavoriteproducts");
-  console.log(req.params.email);
-
-  Favorites.find({ email: req.params.email }, (error, favorites) => {
+  let res = {};
+  Favorites.find({ email: msg.params.email }, (error, favorites) => {
     if (error) {
-      console.log(error);
-      res.writeHead(500, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Internal Server Error - No products found");
+      res.status = 500;
+      res.data = "Internal Server Error";
+      callback(null, res);
     }
     if (favorites) {
       Products.find(
@@ -94,27 +81,33 @@ router.get("/getfavoriteproducts/:email", checkAuth, function (req, res) {
         (error, products) => {
           if (error) {
             console.log(error);
-            res.writeHead(500, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Internal Server Error - No products found");
+            res.status = 500;
+            res.data = "Internal Server Error";
+            callback(null, res);
           }
           if (products) {
-            res.writeHead(200, {
-              "Content-Type": "text/plain",
-            });
-            res.end(JSON.stringify(products));
+            res.status = 200;
+            res.data = products;
+            callback(null, res);
           } else {
           }
         }
       );
     } else {
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("No products found");
+      res.status = 200;
+      res.data = "No products found";
+      callback(null, res);
     }
   });
-});
+};
 
-module.exports = router;
+function handle_request(msg, callback) {
+  console.log(msg);
+  if (msg.path === "addtofavorites") {
+    addtofavorites(msg, callback);
+  } else if (msg.path === "getfavoriteproducts") {
+    getfavoriteproducts(msg, callback);
+  }
+}
+
+exports.handle_request = handle_request;

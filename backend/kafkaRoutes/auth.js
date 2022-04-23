@@ -1,9 +1,4 @@
 const router = require("express").Router();
-const pool = require("../db");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const Users = require("../models/UserModel");
-const { secret } = require("../config");
 const { auth } = require("../utils/passport");
 var kafka = require("../kafka/client");
 auth();
