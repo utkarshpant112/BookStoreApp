@@ -3,7 +3,7 @@ const { checkAuth } = require("../utils/passport");
 const { auth } = require("../Utils/passport");
 var kafka = require("../kafka/client");
 
-router.post("/shopNameAvailable", checkAuth, function (req, res) {
+router.post("/shopNameAvailable", function (req, res) {
   msg = {};
   msg.path = "shopNameAvailable";
   msg.body = req.body;
@@ -12,7 +12,7 @@ router.post("/shopNameAvailable", checkAuth, function (req, res) {
   });
 });
 
-router.post("/isshopalreadycreated", checkAuth, function (req, res) {
+router.post("/isshopalreadycreated", function (req, res) {
   msg = {};
   msg.path = "isshopalreadycreated";
   msg.body = req.body;
@@ -21,7 +21,7 @@ router.post("/isshopalreadycreated", checkAuth, function (req, res) {
   });
 });
 
-router.post("/createshop", checkAuth, function (req, res) {
+router.post("/createshop", function (req, res) {
   msg = {};
   msg.path = "createshop";
   msg.body = req.body;
@@ -30,7 +30,7 @@ router.post("/createshop", checkAuth, function (req, res) {
   });
 });
 
-router.post("/addshopimage", checkAuth, function (req, res) {
+router.post("/addshopimage", function (req, res) {
   msg = {};
   msg.path = "addshopimage";
   msg.body = req.body;
@@ -48,7 +48,7 @@ router.get("/shopimage/:shopname", function (req, res) {
   });
 });
 
-router.get("/shopsalestotal/:shopname", checkAuth, function (req, res) {
+router.get("/shopsalestotal/:shopname", function (req, res) {
   msg = {};
   msg.path = "shopsalestotal";
   msg.params = req.params;

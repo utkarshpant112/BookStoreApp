@@ -12,7 +12,7 @@ router.get("/", function (req, res) {
   });
 });
 
-router.post("/addproduct", checkAuth, function (req, res) {
+router.post("/addproduct", function (req, res) {
   msg = {};
   msg.path = "addproduct";
   msg.body = req.body;
@@ -21,7 +21,7 @@ router.post("/addproduct", checkAuth, function (req, res) {
   });
 });
 
-router.post("/updateproduct", checkAuth, function (req, res) {
+router.post("/updateproduct", function (req, res) {
   msg = {};
   msg.path = "updateproduct";
   msg.body = req.body;

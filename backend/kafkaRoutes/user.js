@@ -12,7 +12,7 @@ router.get("/userprofile/:email", function (req, res) {
   });
 });
 
-router.post("/updateprofile", checkAuth, function (req, res) {
+router.post("/updateprofile", function (req, res) {
   msg = {};
   msg.path = "updateprofile";
   msg.body = req.body;
@@ -21,7 +21,7 @@ router.post("/updateprofile", checkAuth, function (req, res) {
   });
 });
 
-router.get("/ownerdetails/:shopname", checkAuth, function (req, res) {
+router.get("/ownerdetails/:shopname", function (req, res) {
   msg = {};
   msg.path = "ownerdetails";
   msg.shopname = req.params.shopname;

@@ -3,7 +3,7 @@ const { checkAuth } = require("../utils/passport");
 var kafka = require("../kafka/client");
 const { auth } = require("../Utils/passport");
 
-router.post("/createorder", checkAuth, function (req, res) {
+router.post("/createorder", function (req, res) {
   msg = {};
   msg.path = "createorder";
   msg.body = req.body;
@@ -12,7 +12,7 @@ router.post("/createorder", checkAuth, function (req, res) {
   });
 });
 
-router.get("/:email", checkAuth, function (req, res) {
+router.get("/:email", function (req, res) {
   msg = {};
   msg.path = "fetchorders";
   msg.params = req.params;

@@ -11,7 +11,8 @@ import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import FavoriteModal from "../components/FavoriteModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setcartaction } from "../actions/cartAction";
 
 function ProductPage(props) {
   const { id } = useParams();
@@ -23,6 +24,8 @@ function ProductPage(props) {
   const currency = useSelector((state) => state.currency.currency);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const userInfo = useSelector((state) => state.userInfo);
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     console.log(id);
@@ -64,6 +67,7 @@ function ProductPage(props) {
           ...product,
         };
         localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        dispatch(setcartaction(JSON.stringify(cartItems)));
         setMessage("Product added to cart.");
         return;
       }
@@ -75,6 +79,7 @@ function ProductPage(props) {
         ...product,
       };
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      dispatch(setcartaction(JSON.stringify(cartItems)));
       setMessage("Product added to cart.");
     } else if (addToCartQuantity <= product.instock) {
       var cartItems = [
@@ -84,6 +89,7 @@ function ProductPage(props) {
         },
       ];
       localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      dispatch(setcartaction(JSON.stringify(cartItems)));
       setMessage("Product added to cart.");
     } else {
       setMessage("Quantity of product you entered is not available.");

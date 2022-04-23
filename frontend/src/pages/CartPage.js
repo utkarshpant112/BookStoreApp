@@ -11,7 +11,8 @@ import { Link } from "react-router-dom";
 import ListGroupItem from "react-bootstrap/esm/ListGroupItem";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setcartaction } from "../actions/cartAction";
 
 function CartPage(props) {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ function CartPage(props) {
   const currency = useSelector((state) => state.currency.currency);
   const userInfo = useSelector((state) => state.userInfo);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (localStorage.getItem("cartItems") != null) {
@@ -96,6 +99,7 @@ function CartPage(props) {
             ...response.data,
           };
           localStorage.setItem("cartItems", JSON.stringify(cartItems));
+          dispatch(setcartaction(JSON.stringify(cartItems)));
           if (localStorage.getItem("cartItems") != null) {
             setcartitems(JSON.parse(localStorage.getItem("cartItems")));
           }
@@ -117,8 +121,10 @@ function CartPage(props) {
         }
       );
       localStorage.setItem("cartItems", JSON.stringify(newArray));
+      dispatch(setcartaction(JSON.stringify(newArray)));
       if (localStorage.getItem("cartItems") === "") {
         localStorage.removeItem("cartItems");
+        dispatch(setcartaction(null));
       }
       if (localStorage.getItem("cartItems") != null) {
         setcartitems(JSON.parse(localStorage.getItem("cartItems")));
