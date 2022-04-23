@@ -3,6 +3,7 @@ var connection = new require("./kafka/Connection");
 //var signin = require('./services/signin.js');
 // var Books = require('./services/books.js');
 var Auth = require("./services/auth.js");
+var User = require("./services/user.js");
 
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
@@ -59,3 +60,4 @@ function handleTopicRequest(topic_name, fname) {
 //first argument is topic name
 //second argument is a function that will handle this topic request
 handleTopicRequest("auth", Auth);
+handleTopicRequest("user", User);

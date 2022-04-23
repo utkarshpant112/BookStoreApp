@@ -59,7 +59,7 @@ mongoose.connect(mongoDB, options, (err, res) => {
 
 const authRoute = require("./kafkaRoutes/auth");
 const productRoute = require("./mongoRoutes/product");
-const userRoute = require("./mongoRoutes/user");
+const userRoute = require("./kafkaRoutes/user");
 const shopRoute = require("./mongoRoutes/shop");
 const orderRoute = require("./mongoRoutes/order");
 const favoriteRoute = require("./mongoRoutes/favorite");
