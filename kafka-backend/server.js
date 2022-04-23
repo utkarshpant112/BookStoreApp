@@ -5,6 +5,7 @@ var connection = new require("./kafka/Connection");
 var Auth = require("./services/auth.js");
 var User = require("./services/user.js");
 var Product = require("./services/product.js");
+var Shop = require("./services/shop.js");
 
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
@@ -63,3 +64,4 @@ function handleTopicRequest(topic_name, fname) {
 handleTopicRequest("auth", Auth);
 handleTopicRequest("user", User);
 handleTopicRequest("product", Product);
+handleTopicRequest("shop", Shop);
