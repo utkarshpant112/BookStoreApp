@@ -1,293 +1,283 @@
-const router = require("express").Router();
-var mysql = require("mysql");
-const pool = require("../db");
 const Products = require("../models/ProductModel");
 const Categorys = require("../models/CategoryModel");
 const { checkAuth } = require("../utils/passport");
 const { auth } = require("../Utils/passport");
 
-//Route to get All Products when user visits the Home Page
-router.get("/", function (req, res) {
+getallproducts = async (msg, callback) => {
+  console.log("Inside getallproducts");
+  let res = {};
   Products.find((error, products) => {
     if (error) {
       console.log(error);
-      res.writeHead(500, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Internal Server Error - No products found");
+      res.status = 500;
+      res.data = "Internal Server Error - No products found";
+      callback(null, res);
     }
     if (products) {
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(products));
+      res.status = 200;
+      res.data = products;
+      callback(null, res);
     } else {
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("No products found");
+      res.status = 200;
+      res.data = "No products found";
+      callback(null, res);
     }
   });
-});
+};
 
-router.post("/addproduct", checkAuth, function (req, res) {
+addproduct = async (msg, callback) => {
   console.log("Inside add product");
-
+  let res = {};
   var newProducts = new Products({
-    name: req.body.name,
-    price: req.body.price,
-    instock: req.body.instock,
-    category: req.body.category,
-    description: req.body.description,
-    image: req.body.image,
-    shopname: req.body.shopname,
+    name: msg.body.name,
+    price: msg.body.price,
+    instock: msg.body.instock,
+    category: msg.body.category,
+    description: msg.body.description,
+    image: msg.body.image,
+    shopname: msg.body.shopname,
   });
   Products.findOne(
-    { name: req.body.name, shopname: req.body.shopname },
+    { name: msg.body.name, shopname: msg.body.shopname },
     (error, product) => {
       if (error) {
         console.log(error);
-        res.writeHead(500, {
-          "Content-Type": "text/plain",
-        });
-        res.end();
+        res.status = 500;
+        res.data = "Internal Server Error";
+        callback(null, res);
       }
       if (product) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("You've already created a product of similar name");
+        res.status = 400;
+        res.data = "You've already created a product of similar name";
+        callback(null, res);
       } else {
         newProducts.save((error, data) => {
           if (error) {
-            res.writeHead(500, {
-              "Content-Type": "text/plain",
-            });
-            res.end();
+            res.status = 500;
+            res.data = "Internal Server Error";
+            callback(null, res);
           } else {
-            res.writeHead(200, {
-              "Content-Type": "text/plain",
-            });
-            res.end("Product Added");
+            res.status = 200;
+            res.data = "Product Added";
+            callback(null, res);
           }
         });
       }
     }
   );
-});
+};
 
-router.post("/updateproduct", checkAuth, function (req, res) {
+updateproduct = async (msg, callback) => {
   console.log("Inside update product");
+  let res = {};
   Products.findOneAndUpdate(
-    { name: req.body.name },
+    { name: msg.body.name },
     {
-      price: req.body.price,
-      instock: req.body.instock,
-      category: req.body.category,
-      description: req.body.description,
-      image: req.body.image,
+      price: msg.body.price,
+      instock: msg.body.instock,
+      category: msg.body.category,
+      description: msg.body.description,
+      image: msg.body.image,
     }
   )
     .then((product) => {
       if (product) {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Product Updated");
+        res.status = 200;
+        res.data = "Product Updated";
+        callback(null, res);
       } else {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Product not found");
+        res.status = 400;
+        res.data = "Product not found";
+        callback(null, res);
       }
     })
     .catch((err) => {
-      res.writeHead(400, {
-        "Content-Type": "text/plain",
-      });
-      console.log(err);
-      res.end("Product not updated due to some error");
+      res.status = 400;
+      res.data = "Product not updated due to some error";
+      callback(null, res);
     });
-});
+};
 
-router.get("/id/:id", function (req, res) {
-  const id = req.params.id;
-  Products.findOne({ _id: req.params.id }, (error, product) => {
+productdetails = async (msg, callback) => {
+  console.log("Inside product details");
+  let res = {};
+  const id = msg.params.id;
+  Products.findOne({ _id: msg.params.id }, (error, product) => {
     if (error) {
       console.log(error);
-      res.writeHead(500, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Internal Server Error - No products found");
+      res.status = 500;
+      res.data = "Internal Server Error - No products found";
+      callback(null, res);
     }
     if (product) {
-      console.log(id);
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(product));
+      res.status = 200;
+      res.data = product;
+      callback(null, res);
     } else {
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Cannot find product details");
+      res.status = 200;
+      res.data = "Cannot find product details";
+      callback(null, res);
     }
   });
-});
+};
 
-//Route to get All Products when user visits the Home Page
-router.get("/shopproducts/:shopname", function (req, res) {
-  Products.find({ shopname: req.params.shopname })
+productsbyshopname = async (msg, callback) => {
+  console.log("Inside getting products of a shop");
+  let res = {};
+  Products.find({ shopname: msg.params.shopname })
     .then((products) => {
       if (products) {
-        res.writeHead(200, {
-          "Content-Type": "application/json",
-        });
-        res.end(JSON.stringify(products));
+        res.status = 200;
+        res.data = products;
+        callback(null, res);
       } else {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("No products found");
+        res.status = 200;
+        res.data = "No products found";
+        callback(null, res);
       }
     })
     .catch((err) => {
-      res.writeHead(400, {
-        "Content-Type": "text/plain",
-      });
-      console.log(err);
-      res.end("Error in finding products");
+      res.status = 400;
+      res.data = "Error in finding products";
+      callback(null, res);
     });
-});
+};
 
-router.get("/productdetails/:name", function (req, res) {
-  Products.findOne({ name: req.params.name })
+productdetailsbyname = async (msg, callback) => {
+  console.log("Inside product details by product name");
+  let res = {};
+  Products.findOne({ name: msg.params.name })
     .then((product) => {
       if (product) {
-        res.writeHead(200, {
-          "Content-Type": "application/json",
-        });
-        res.end(JSON.stringify(product));
+        res.status = 200;
+        res.data = product;
+        callback(null, res);
       } else {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("No product found");
+        res.status = 200;
+        res.data = "No product found";
+        callback(null, res);
       }
     })
     .catch((err) => {
-      res.writeHead(400, {
-        "Content-Type": "text/plain",
-      });
-      console.log(err);
-      res.end("Error in finding product details");
+      res.status = 400;
+      res.data = "Error in finding product details";
+      callback(null, res);
     });
-});
+};
 
-//Route to get All Products when user visits the Home Page
-router.get("/categories", function (req, res) {
-  console.log("Inside Categories");
+categories = async (msg, callback) => {
+  console.log("Inside categories");
+  let res = {};
   Categorys.find((error, categories) => {
     if (error) {
       console.log(error);
-      res.writeHead(500, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Internal Server Error - No categories found");
+      res.status = 500;
+      res.data = "Internal Server Error - No categories found";
+      callback(null, res);
     }
     if (categories) {
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(categories));
+      res.status = 200;
+      res.data = categories;
+      callback(null, res);
     } else {
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("No categories found");
+      res.status = 200;
+      res.data = "No categories found";
+      callback(null, res);
     }
   });
-});
+};
 
-//Route to get other Products when user visits the Home Page
-router.get("/othersellerproducts/:shopname", function (req, res) {
-  console.log("Inside othersellerproducts");
-  Products.find({ shopname: { $ne: req.params.shopname } })
+othersellerproducts = async (msg, callback) => {
+  console.log("Inside categories");
+  let res = {};
+  Products.find({ shopname: { $ne: msg.params.shopname } })
     .then((products) => {
       if (products) {
-        res.writeHead(200, {
-          "Content-Type": "application/json",
-        });
-        res.end(JSON.stringify(products));
+        res.status = 200;
+        res.data = products;
+        callback(null, res);
       } else {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("No products found");
+        res.status = 200;
+        res.data = "No products found";
+        callback(null, res);
       }
     })
     .catch((err) => {
-      res.writeHead(400, {
-        "Content-Type": "text/plain",
-      });
-      console.log(err);
-      res.end("Error in finding products");
+      res.status = 400;
+      res.data = "Error in finding products";
+      callback(null, res);
     });
-});
+};
 
-router.get("/search", function (req, res) {
-  console.log("Inside Products 1");
-  console.log(req.query.name);
-  if (req.query.shopname === "") {
+search = async (msg, callback) => {
+  console.log("Search");
+  let res = {};
+  console.log(msg.query.name);
+  if (msg.query.shopname === "") {
     Products.find({
-      name: { $regex: ".*" + req.query.name + ".*", $options: "i" },
+      name: { $regex: ".*" + msg.query.name + ".*", $options: "i" },
     })
       .then((products) => {
         if (products) {
-          res.writeHead(200, {
-            "Content-Type": "application/json",
-          });
-          res.end(JSON.stringify(products));
+          res.status = 200;
+          res.data = products;
+          callback(null, res);
         } else {
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end("No products found");
+          res.status = 200;
+          res.data = "No products found";
+          callback(null, res);
         }
       })
       .catch((err) => {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        console.log(err);
-        res.end("Error in finding products");
+        res.status = 400;
+        res.data = "Error in finding products";
+        callback(null, res);
       });
   } else {
     Products.find({
-      name: { $regex: ".*" + req.query.name + ".*", $options: "i" },
-      shopname: { $nin: req.query.shopname },
+      name: { $regex: ".*" + msg.query.name + ".*", $options: "i" },
+      shopname: { $nin: msg.query.shopname },
     })
       .then((products) => {
         if (products) {
-          res.writeHead(200, {
-            "Content-Type": "application/json",
-          });
-          res.end(JSON.stringify(products));
+          res.status = 200;
+          res.data = products;
+          callback(null, res);
         } else {
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end("No products found");
+          res.status = 200;
+          res.data = "No products found";
+          callback(null, res);
         }
       })
       .catch((err) => {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        console.log(err);
-        res.end("Error in finding products");
+        res.status = 400;
+        res.data = "Error in finding products";
+        callback(null, res);
       });
   }
-});
+};
 
-module.exports = router;
+function handle_request(msg, callback) {
+  console.log(msg);
+  if (msg.path === "getallproducts") {
+    getallproducts(msg, callback);
+  } else if (msg.path === "addproduct") {
+    addproduct(msg, callback);
+  } else if (msg.path === "updateproduct") {
+    updateproduct(msg, callback);
+  } else if (msg.path === "productdetails") {
+    productdetails(msg, callback);
+  } else if (msg.path === "productsbyshopname") {
+    productsbyshopname(msg, callback);
+  } else if (msg.path === "productdetailsbyname") {
+    productdetailsbyname(msg, callback);
+  } else if (msg.path === "categories") {
+    categories(msg, callback);
+  } else if (msg.path === "othersellerproducts") {
+    othersellerproducts(msg, callback);
+  } else if (msg.path === "search") {
+    search(msg, callback);
+  }
+}
+
+exports.handle_request = handle_request;
