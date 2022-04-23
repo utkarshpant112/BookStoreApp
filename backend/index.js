@@ -61,7 +61,7 @@ const authRoute = require("./kafkaRoutes/auth");
 const productRoute = require("./kafkaRoutes/product");
 const userRoute = require("./kafkaRoutes/user");
 const shopRoute = require("./kafkaRoutes/shop");
-const orderRoute = require("./mongoRoutes/order");
+const orderRoute = require("./kafkaRoutes/order");
 const favoriteRoute = require("./mongoRoutes/favorite");
 
 app.use("/api/auth", authRoute);

@@ -6,6 +6,7 @@ var Auth = require("./services/auth.js");
 var User = require("./services/user.js");
 var Product = require("./services/product.js");
 var Shop = require("./services/shop.js");
+var Order = require("./services/order.js");
 
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
@@ -65,3 +66,4 @@ handleTopicRequest("auth", Auth);
 handleTopicRequest("user", User);
 handleTopicRequest("product", Product);
 handleTopicRequest("shop", Shop);
+handleTopicRequest("order", Order);
