@@ -113,6 +113,7 @@ function ProductPage(props) {
               ></img>
               <FavoriteModal
                 name={product.name}
+                _id={product._id}
                 shopname={product.shopname}
                 class="rounded-circle-product-page"
               ></FavoriteModal>

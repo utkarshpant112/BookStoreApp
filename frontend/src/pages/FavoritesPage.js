@@ -52,7 +52,7 @@ const FavoritesPage = () => {
     axios.defaults.headers.common["authorization"] =
       localStorage.getItem("token");
     axios
-      .get("/api/favorite/getfavoriteproducts/" + useremail)
+      .get("/api/favorite/getfavoriteproducts/" + userInfo._id)
       .then((response) => {
         setProducts(response.data);
         setfilteredProducts(response.data);

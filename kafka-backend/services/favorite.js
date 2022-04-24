@@ -7,7 +7,13 @@ addtofavorites = async (msg, callback) => {
   console.log("Inside getfavoriteproducts");
   let res = {};
   Favorites.findOne(
-    { name: msg.body.name, shopname: msg.body.shopname, email: msg.body.email },
+    {
+      product_id: msg.body.product_id,
+      user_id: msg.body.user_id,
+      name: msg.body.name,
+      shopname: msg.body.shopname,
+      email: msg.body.email,
+    },
     (error, favorite) => {
       if (error) {
         res.status = 500;
@@ -17,6 +23,8 @@ addtofavorites = async (msg, callback) => {
       if (favorite) {
         Favorites.deleteOne(
           {
+            product_id: msg.body.product_id,
+            user_id: msg.body.user_id,
             name: msg.body.name,
             shopname: msg.body.shopname,
             email: msg.body.email,
@@ -40,6 +48,8 @@ addtofavorites = async (msg, callback) => {
         );
       } else {
         var newFavorite = new Favorites({
+          product_id: msg.body.product_id,
+          user_id: msg.body.user_id,
           name: msg.body.name,
           shopname: msg.body.shopname,
           email: msg.body.email,
@@ -63,7 +73,7 @@ addtofavorites = async (msg, callback) => {
 getfavoriteproducts = async (msg, callback) => {
   console.log("Inside getfavoriteproducts");
   let res = {};
-  Favorites.find({ email: msg.params.email }, (error, favorites) => {
+  Favorites.find({ user_id: msg.params.user_id }, (error, favorites) => {
     if (error) {
       res.status = 500;
       res.data = "Internal Server Error";

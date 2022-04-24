@@ -33,11 +33,12 @@ login = async (msg, callback) => {
             pic: user.pic,
             phone: user.phone,
           };
-          const token = jwt.sign(payload, secret, {
-            expiresIn: 1008000,
-          });
+          // const token = jwt.sign(payload, secret, {
+          //   expiresIn: 1008000,
+          // });
           res.status = 200;
-          res.data = "JWT " + token;
+          res.data = payload;
+          // res.data = "JWT " + token;
           callback(null, res);
         } else {
           res.status = 401;
@@ -110,11 +111,12 @@ signup = async (msg, callback) => {
                     pic: user.pic,
                     phone: user.phone,
                   };
-                  const token = jwt.sign(payload, secret, {
-                    expiresIn: 1008000,
-                  });
+                  // const token = jwt.sign(payload, secret, {
+                  //   expiresIn: 1008000,
+                  // });
                   res.status = 200;
-                  res.data = "JWT " + token;
+                  // res.data = "JWT " + token;
+                  res.data = payload;
                   callback(null, res);
                 } else {
                   res.status = 400;

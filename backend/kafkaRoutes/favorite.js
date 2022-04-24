@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { checkAuth } = require("../utils/passport");
 const { auth } = require("../Utils/passport");
+const passport = require("passport");
 var kafka = require("../kafka/client");
 
 router.post("/addtofavorites", function (req, res) {
@@ -12,7 +13,7 @@ router.post("/addtofavorites", function (req, res) {
   });
 });
 
-router.get("/getfavoriteproducts/:email", function (req, res) {
+router.get("/getfavoriteproducts/:user_id", function (req, res) {
   msg = {};
   msg.path = "getfavoriteproducts";
   msg.params = req.params;

@@ -29,10 +29,13 @@ export default function FavoriteModal(props) {
     } else {
       //prevent page from refresh
       e.preventDefault();
-      console.log();
+      console.log(props._id);
+      console.log(userInfo._id);
       const data = {
+        product_id: props._id,
         name: props.name,
         shopname: props.shopname,
+        user_id: userInfo._id,
         email: userInfo.email,
       };
       //set the with credentials to true

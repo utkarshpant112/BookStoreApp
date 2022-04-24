@@ -21,6 +21,7 @@ function Product(props) {
       <div>
         <FavoriteModal
           name={product.name}
+          _id={product._id}
           shopname={product.shopname}
           class="rounded-circle-card"
         ></FavoriteModal>

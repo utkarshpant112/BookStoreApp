@@ -130,9 +130,17 @@ function MuPurchasesPage(props) {
     setTimeout(function () {
       axios.get("/api//order/" + userInfo.email).then((response) => {
         //update the state with the response data
+        response.data.sort(
+          (a, b) =>
+            a.dateofpurchase.localeCompare(b.date) ||
+            a.time.dateofpurchase(b.time)
+        );
+        console.log(response.data);
+        // );
+
         setOrders(response.data);
       });
-    }, 500);
+    }, 250);
   }, []);
 
   return orders.length === 0 ? (

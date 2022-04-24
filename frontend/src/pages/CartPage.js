@@ -155,7 +155,7 @@ function CartPage(props) {
         shopname: item.shopname,
         currency: currency,
         quantity: item.quantity,
-        date: new Date().toLocaleDateString(),
+        date: new Date().toLocaleString(),
         email: userInfo.email,
         isgiftwrapped: checked,
         description: text,

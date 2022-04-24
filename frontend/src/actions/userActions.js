@@ -35,7 +35,7 @@ export const login = (email, password) => async (dispatch) => {
           localStorage.setItem("token", response.data);
 
           var decoded = jwt_decode(response.data.split(" ")[1]);
-          dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded });
+          dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded.data });
         }
         return "";
       })
@@ -77,7 +77,7 @@ export const signup = (name, email, password) => async (dispatch) => {
         if (response.status === 200) {
           localStorage.setItem("token", response.data);
           var decoded = jwt_decode(response.data.split(" ")[1]);
-          dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded });
+          dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded.data });
           return "";
         }
       })
