@@ -1,7 +1,5 @@
 const router = require("express").Router();
-const { checkAuth } = require("../utils/passport");
 var kafka = require("../kafka/client");
-const { auth } = require("../Utils/passport");
 
 router.post("/createorder", function (req, res) {
   msg = {};

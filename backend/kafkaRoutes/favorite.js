@@ -1,7 +1,4 @@
 const router = require("express").Router();
-const { checkAuth } = require("../utils/passport");
-const { auth } = require("../Utils/passport");
-const passport = require("passport");
 var kafka = require("../kafka/client");
 
 router.post("/addtofavorites", function (req, res) {

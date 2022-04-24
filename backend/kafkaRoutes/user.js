@@ -1,7 +1,5 @@
 const router = require("express").Router();
 var kafka = require("../kafka/client");
-const { checkAuth } = require("../utils/passport");
-const { auth } = require("../Utils/passport");
 
 router.get("/userprofile/:email", function (req, res) {
   msg = {};

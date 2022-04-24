@@ -1,6 +1,4 @@
 const router = require("express").Router();
-const { checkAuth } = require("../utils/passport");
-const { auth } = require("../Utils/passport");
 var kafka = require("../kafka/client");
 
 //Route to get All Products when user visits the Home Page
