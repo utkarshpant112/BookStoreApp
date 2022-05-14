@@ -12,6 +12,7 @@ var usersSchema = new Schema(
     country: { type: String, default: "" },
     address: { type: String, default: "" },
     city: { type: String, default: "" },
+    token: { type: String, default: "" },
     about: { type: String, default: "" },
     pic: {
       type: String,

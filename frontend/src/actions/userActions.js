@@ -14,6 +14,15 @@ import {
   USER_SIGNUP_FAIL,
 } from "../constants/userConstants";
 
+const qlQuery = async (query, variables = {}) => {
+  const resp = await fetch("http://localhost:4001", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ query, variables }),
+  });
+  return (await resp.json()).data;
+};
+
 export const login = (email, password) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST, payload: { email, password } });
 
@@ -26,24 +35,34 @@ export const login = (email, password) => async (dispatch) => {
     };
     console.log(email, password);
     axios.defaults.withCredentials = true;
-    axios
-      .post("/api/auth/login", data)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        console.log("Status data : ", response.data);
-        if (response.status === 200) {
-          localStorage.setItem("token", response.data);
+    const userRes = await qlQuery(
+      "mutation login($email:String!,$password:String!) {loginUser(email:$email,password:$password) {token}}",
+      { email: email, password: password } //variables need to passed as the second argument
+    );
+    console.log("userRes", userRes);
+    localStorage.setItem("token", userRes.addUser.token);
+    var decoded = jwt_decode(userRes.addUser.token.split(" ")[1]);
+    console.log(decoded);
+    dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded });
 
-          var decoded = jwt_decode(response.data.split(" ")[1]);
-          dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded.data });
-        }
-        return "";
-      })
-      .catch((error) => {
-        console.log(error);
-        dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
-        return error.response.data;
-      });
+    // axios
+    //   .post("/api/auth/login", data)
+    //   .then((response) => {
+    //     console.log("Status Code : ", response.status);
+    //     console.log("Status data : ", response.data);
+    //     if (response.status === 200) {
+    //       localStorage.setItem("token", response.data);
+
+    //       var decoded = jwt_decode(response.data.split(" ")[1]);
+    //       dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded.data });
+    //     }
+    //     return "";
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //     dispatch({ type: USER_LOGIN_FAIL, payload: error.response.data });
+    //     return error.response.data;
+    //   });
   }
 };
 
@@ -62,30 +81,38 @@ export const signup = (name, email, password) => async (dispatch) => {
       payload: "Name must have letters only",
     });
   } else {
-    const data = {
-      name: name,
-      email: email,
-      password: password,
-    };
+    // const data = {
+    //   email: email,
+    //   name: name,
+    //   password: password,
+    // };
     console.log(name, email, password);
     axios.defaults.withCredentials = true;
-
-    axios
-      .post("/api/auth/signup", data)
-      .then((response) => {
-        console.log("Status Code : ", response.status);
-        if (response.status === 200) {
-          localStorage.setItem("token", response.data);
-          var decoded = jwt_decode(response.data.split(" ")[1]);
-          dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded.data });
-          return "";
-        }
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-        dispatch({ type: USER_SIGNUP_FAIL, payload: error.response.data });
-        return error.response.data;
-      });
+    const userRes = await qlQuery(
+      "mutation addUs($name:String!,$email:String!,$password:String!) {addUser(name:$name,email:$email,password:$password) {token }}",
+      { email: email, password: password, name: name } //variables need to passed as the second argument
+    );
+    console.log("userRes", userRes);
+    localStorage.setItem("token", userRes.addUser.token);
+    var decoded = jwt_decode(userRes.addUser.token.split(" ")[1]);
+    console.log(decoded);
+    dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded });
+    // axios
+    //   .post("/api/auth/signup", data)
+    //   .then((response) => {
+    //     console.log("Status Code : ", response.status);
+    //     if (response.status === 200) {
+    //       localStorage.setItem("token", response.data);
+    //       var decoded = jwt_decode(response.data.split(" ")[1]);
+    //       dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded.data });
+    //       return "";
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error.response.data);
+    //     dispatch({ type: USER_SIGNUP_FAIL, payload: error.response.data });
+    //     return error.response.data;
+    //   });
   }
 };
 
