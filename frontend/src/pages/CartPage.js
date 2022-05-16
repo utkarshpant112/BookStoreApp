@@ -24,6 +24,8 @@ function CartPage(props) {
   const userInfo = useSelector((state) => state.userInfo);
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   const cart = useSelector((state) => state.cart);
+  const [checkedState, setCheckedState] = useState([]);
+  const [textIndex, setTextIndex] = useState([]);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -31,10 +33,15 @@ function CartPage(props) {
       setcartitems(
         cartItems.concat(JSON.parse(localStorage.getItem("cartItems")))
       );
+      console.log(checkedState);
+      setCheckedState(new Array(2).fill(false));
+      setTextIndex(new Array(2).fill(""));
+
+      console.log(textIndex);
     }
   }, []);
 
-  useEffect(() => {}, [cartItems]);
+  useEffect(() => {}, [cartItems, textIndex]);
 
   const reducequantity = async (_id) => {
     setmessage("");
@@ -146,7 +153,7 @@ function CartPage(props) {
     //prevent page from refresh
     console.log(cartItems);
     e.preventDefault();
-    cartItems.map((item) => {
+    cartItems.map((item, index) => {
       console.log(item.image);
       const data = {
         name: item.name,
@@ -157,8 +164,8 @@ function CartPage(props) {
         quantity: item.quantity,
         date: new Date().toLocaleString(),
         email: userInfo.email,
-        isgiftwrapped: checked,
-        description: text,
+        isgiftwrapped: checkedState[index],
+        description: textIndex[index],
       };
 
       axios.defaults.withCredentials = true;
@@ -179,6 +186,12 @@ function CartPage(props) {
         })
         .then(navigate("/mypurchases"));
     });
+  };
+
+  const textIndexChangeHandler = (index, e) => {
+    textIndex[index] = "Surprise! HBD";
+    console.log(textIndex);
+    setTextIndex(textIndex);
   };
 
   return cartItems.length === 0 ? (
@@ -213,7 +226,7 @@ function CartPage(props) {
               </Row>
             </ListGroupItem>
 
-            {cartItems.map((item) => (
+            {cartItems.map((item, index) => (
               <ListGroup.Item key={item._id}>
                 <Row className="align-items-center">
                   <Col md={5}>
@@ -272,12 +285,19 @@ function CartPage(props) {
                           <input
                             name="checkbox"
                             type="checkbox"
-                            checked={checked}
+                            checked={checkedState[index]}
                             onChange={() => {
-                              if (checked) {
-                                setText("");
-                              }
-                              setChecked(!checked);
+                              const updatedCheckedState = checkedState.map(
+                                (item, index1) =>
+                                  index1 === index ? !item : item
+                              );
+
+                              setCheckedState(updatedCheckedState);
+
+                              // if (checked) {
+                              //   setText("");
+                              // }
+                              // setChecked(!checked);
                             }}
                           />
                         </label>
@@ -288,9 +308,10 @@ function CartPage(props) {
                           <input
                             name="input"
                             type="text"
-                            disabled={!checked}
-                            value={text}
-                            onChange={(e) => setText(e.target.value)}
+                            disabled={!checkedState[index]}
+                            onChange={(e) => {
+                              textIndexChangeHandler(index, e);
+                            }}
                           />
                         </label>
                       </Col>

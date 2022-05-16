@@ -6,7 +6,7 @@ router.get("/", function (req, res) {
   msg = {};
   msg.path = "getallproducts";
   kafka.make_request("product", msg, (err, results) => {
-    res.status(results.status).send(results.data);
+    res.status(200).send(results.data);
   });
 });
 

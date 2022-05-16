@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useDispatch, useSelector } from "react-redux";
+import { storage_bucket } from "../Utilities/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { favoritesupdated } from "../actions/favoritesaction";
 
 export default function FavoriteModal(props) {
