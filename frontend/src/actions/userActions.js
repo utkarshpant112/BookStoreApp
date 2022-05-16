@@ -1,6 +1,7 @@
 import axios from "axios";
 import validator from "validator";
 import jwt_decode from "jwt-decode";
+import { loginMutation, signUpMutation } from "../graphql/mutations";
 
 import {
   USER_LOGIN_FAIL,
@@ -29,22 +30,19 @@ export const login = (email, password) => async (dispatch) => {
   if (!validator.isEmail(email)) {
     dispatch({ type: USER_LOGIN_FAIL, payload: "Email is not valid" });
   } else {
-    const data = {
-      email: email,
-      password: password,
-    };
     console.log(email, password);
-    axios.defaults.withCredentials = true;
+
     const userRes = await qlQuery(
-      "mutation login($email:String!,$password:String!) {loginUser(email:$email,password:$password) {token}}",
+      loginMutation,
       { email: email, password: password } //variables need to passed as the second argument
     );
     console.log("userRes", userRes);
-    localStorage.setItem("token", userRes.addUser.token);
-    var decoded = jwt_decode(userRes.addUser.token.split(" ")[1]);
+    localStorage.setItem("token", userRes.loginUser.token);
+    var decoded = jwt_decode(userRes.loginUser.token.split(" ")[1]);
     console.log(decoded);
-    dispatch({ type: USER_SIGNUP_SUCCESS, payload: decoded });
+    dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded });
 
+    // axios.defaults.withCredentials = true;
     // axios
     //   .post("/api/auth/login", data)
     //   .then((response) => {
@@ -54,7 +52,8 @@ export const login = (email, password) => async (dispatch) => {
     //       localStorage.setItem("token", response.data);
 
     //       var decoded = jwt_decode(response.data.split(" ")[1]);
-    //       dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded.data });
+    //       console.log(decoded);
+    //       dispatch({ type: USER_LOGIN_SUCCESS, payload: decoded });
     //     }
     //     return "";
     //   })
@@ -88,8 +87,10 @@ export const signup = (name, email, password) => async (dispatch) => {
     // };
     console.log(name, email, password);
     axios.defaults.withCredentials = true;
+    const data = { email: email, password: password, name: name };
+
     const userRes = await qlQuery(
-      "mutation addUs($name:String!,$email:String!,$password:String!) {addUser(name:$name,email:$email,password:$password) {token }}",
+      signUpMutation,
       { email: email, password: password, name: name } //variables need to passed as the second argument
     );
     console.log("userRes", userRes);
