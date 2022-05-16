@@ -2,7 +2,7 @@
 var express = require("express");
 var app = express();
 
-const { ApolloServer, gql } = require("apollo-server");
+const { ApolloServer, gql, UserInputError } = require("apollo-server");
 var bodyParser = require("body-parser");
 var session = require("express-session");
 var cookieParser = require("cookie-parser");
@@ -13,6 +13,7 @@ const { auth } = require("./utils/passport");
 const bcrypt = require("bcryptjs");
 const { secret } = require("./config");
 const jwt = require("jsonwebtoken");
+const typeDefs = require("./typeDefs");
 
 app.set("view engine", "ejs");
 
@@ -41,6 +42,10 @@ app.use(function (req, res, next) {
 });
 
 const users = require("./models/UserModel");
+const products = require("./models/ProductModel");
+const orders = require("./models/OrderModel");
+const shops = require("./models/ShopModel");
+const categories = require("./models/CategoryModel");
 
 const { mongoDB } = require("./config");
 const mongoose = require("mongoose");
@@ -100,127 +105,113 @@ app.use("/api/shop", shopRoute);
 app.use("/api/order", orderRoute);
 app.use("/api/favorite", favoriteRoute);
 
-const typeDefs = gql`
-  type User {
-    _id: ID!
-    email: String!
-    name: String!
-    password: String!
-    shopname: String!
-    dob: String!
-    address: String!
-    city: String!
-    country: String!
-    about: String!
-    pic: String!
-    phone: String!
-    token: String!
-  }
+// const resolvers = {
+//   Query: {
+//     users: async () => {
+//       return users;
+//     },
+//   },
+//   Mutation: {
+//     addUser: async (parent, { email, name, password }, context) => {
+//       const salt = await bcrypt.genSalt(10);
+//       const hashedPassword = await bcrypt.hash(password, salt);
+//       const response = await users.findOne({
+//         email: email,
+//       });
+//       console.log(response);
+//       if (response === null) {
+//         console.log("here");
+//         var newUser = new users({
+//           name: name,
+//           email: email,
+//           password: hashedPassword,
+//         });
+//         console.log(newUser);
+//         const user = await newUser.save();
+//         console.log(user);
+//         const payload = {
+//           _id: user._id,
+//           name: user.name,
+//           email: user.email,
+//           shopname: user.shopname,
+//           dob: user.dob,
+//           country: user.country,
+//           address: user.address,
+//           city: user.city,
+//           about: user.about,
+//           pic: user.pic,
+//           phone: user.phone,
+//         };
+//         console.log(payload);
+//         console.log("user created", response);
+//         const token = jwt.sign(payload, secret, {
+//           expiresIn: 1008000,
+//         });
+//         console.log("jwt", token);
+//         const returnUser = {
+//           token: "JWT " + token,
+//         };
+//         // console.log("data", returnUser);
+//         return returnUser;
+//       }
+//     },
+//     loginUser: async (parent, { email, password }, context) => {
+//       console.log("here");
+//       let inputPassword = password;
+//       const response = await users.findOne({
+//         email: email,
+//       });
+//       const result = await bcrypt.compare(password, response.password);
+//       if (result) {
+//         const payload = {
+//           _id: response._id,
+//           name: response.name,
+//           email: response.email,
+//           shopname: response.shopname,
+//           dob: response.dob,
+//           country: response.country,
+//           address: response.address,
+//           city: response.city,
+//           about: response.about,
+//           pic: response.pic,
+//           phone: response.phone,
+//         };
+//         const token = jwt.sign(payload, secret, {
+//           expiresIn: 1008000,
+//         });
+//         const returnUser = {
+//           token: "JWT " + token,
+//         };
+//         console.log(returnUser);
+//         return returnUser;
+//       } else {
+//         throw new UserInputError("Login invalid");
+//       }
+//     },
+//     addProduct: async (
+//       parent,
+//       { name, price, instock, category, description, image, shopname },
+//       context
+//     ) => {
+//       console.log("add product");
+//       var newProducts = new products({
+//         name: name,
+//         price: price,
+//         instock: instock,
+//         category: category,
+//         description: description,
+//         image: image,
+//         shopname: shopname,
+//       });
 
-  type Product {
-    _id: ID!
-    name: String!
-    price: Float!
-    instock: Int!
-    category: String!
-    description: String!
-    shopname: String!
-    image: String!
-    totalsales: Int!
-  }
-
-  type Query {
-    users: [User]
-  }
-  type Mutation {
-    addUser(email: String!, name: String!, password: String!): User
-    loginUser(email: String!, password: String!): User
-  }
-`;
-
-const resolvers = {
-  Query: {
-    users: async () => {
-      return users;
-    },
-  },
-  Mutation: {
-    addUser: async (parent, { email, name, password }, context) => {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      const response = await users.findOne({
-        email: email,
-      });
-      console.log(response);
-      if (response === null) {
-        console.log("here");
-        var newUser = new users({
-          name: name,
-          email: email,
-          password: hashedPassword,
-        });
-        console.log(newUser);
-        const user = await newUser.save();
-        console.log(user);
-        const payload = {
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          shopname: user.shopname,
-          dob: user.dob,
-          country: user.country,
-          address: user.address,
-          city: user.city,
-          about: user.about,
-          pic: user.pic,
-          phone: user.phone,
-        };
-        console.log(payload);
-        console.log("user created", response);
-        const token = jwt.sign(payload, secret, {
-          expiresIn: 1008000,
-        });
-        console.log("jwt", token);
-        const returnUser = {
-          token: "JWT " + token,
-        };
-        // console.log("data", returnUser);
-        return returnUser;
-      }
-    },
-    loginUser: async (parent, { email, password }, context) => {
-      console.log("here");
-      let inputPassword = password;
-      const response = await users.findOne({
-        email: email,
-      });
-      const result = await bcrypt.compare(password, response.password);
-      if (result) {
-        const payload = {
-          _id: response._id,
-          name: response.name,
-          email: response.email,
-          shopname: response.shopname,
-          dob: response.dob,
-          country: response.country,
-          address: response.address,
-          city: response.city,
-          about: response.about,
-          pic: response.pic,
-          phone: response.phone,
-        };
-        const token = jwt.sign(payload, secret, {
-          expiresIn: 1008000,
-        });
-        const returnUser = {
-          token: "JWT " + token,
-        };
-        console.log(returnUser);
-        return returnUser;
-      }
-    },
-  },
-};
+//       await newProducts.save();
+//       const status = {
+//         token: "Product Added",
+//       };
+//       return status;
+//     },
+//   },
+// };
 
 const server = new ApolloServer({
   typeDefs,
@@ -234,8 +225,8 @@ server.listen({ port: 4001 }).then(({ url }) => {
   console.log(`🚀 Server ready at ${url}`);
 });
 
-//start your server on port 3001
-if (require.main === module) {
-  app.listen(3001);
-  console.log("Server Listening on port 3001");
-}
+// //start your server on port 3001
+// if (require.main === module) {
+//   app.listen(3001);
+//   console.log("Server Listening on port 3001");
+// }

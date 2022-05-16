@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import { shopPageProductsUpdated } from "../actions/productactions";
 import { useNavigate } from "react-router";
 import validator from "validator";
+import { addProductMutation } from "../graphql/mutations";
 
 export default function CreateModal(props) {
   const { shopname } = props;
@@ -38,6 +39,15 @@ export default function CreateModal(props) {
     useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const qlQuery = async (query, variables = {}) => {
+    const resp = await fetch("http://localhost:4001", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query, variables }),
+    });
+    return (await resp.json()).data;
+  };
 
   //name change handler to update state variable with the text entered by the user
   const nameChangeHandler = (e) => {
@@ -99,7 +109,7 @@ export default function CreateModal(props) {
     });
   }, []);
 
-  const addProduct = (e) => {
+  const addProduct = async (e) => {
     if (!validator.isNumeric(price) || !validator.isDecimal(price)) {
       setMessage("Price can only have numbers");
     } else if (!validator.isAlpha(category, "en-US", { ignore: " " })) {
@@ -111,11 +121,11 @@ export default function CreateModal(props) {
       e.preventDefault();
       const data = {
         name: name,
-        price: price,
+        price: parseFloat(price),
         image: image,
         category: category,
         description: description,
-        instock: countInStock,
+        instock: parseInt(countInStock),
         shopname: shopname,
       };
       //set the with credentials to true
@@ -123,26 +133,32 @@ export default function CreateModal(props) {
       //make a post request with the user data
       axios.defaults.headers.common["authorization"] =
         localStorage.getItem("token");
-      axios
-        .post("/api/products/addproduct", data)
-        .then((response) => {
-          console.log("Status Code : ", response.status);
-          if (response.status === 200 && response.data === "Product Added") {
-            setMessage("Product has been added");
-            dispatch(shopPageProductsUpdated(true));
-            setTimeout(() => {
-              handleClose();
-            }, 500);
-          } else {
-            setMessage("Product not added");
-          }
-        })
-        .catch((error) => {
-          console.log(error.response.data);
-          this.setState({
-            message: error.response.data,
-          });
-        });
+      console.log(addProductMutation);
+      console.log(data);
+      const addRes = await qlQuery(addProductMutation, data);
+      console.log(addRes);
+      if (addRes.addProduct.token === "Product Added") {
+        setMessage("Product has been added");
+        dispatch(shopPageProductsUpdated(true));
+        setTimeout(() => {
+          handleClose();
+        }, 500);
+      }
+      //   axios
+      //     .post("/api/products/addproduct", data)
+      //     .then((response) => {
+      //       console.log("Status Code : ", response.status);
+      //
+      //       } else {
+      //         setMessage("Product not added");
+      //       }
+      //     })
+      //     .catch((error) => {
+      //       console.log(error.response.data);
+      //       this.setState({
+      //         message: error.response.data,
+      //       });
+      //     });
     }
   };
 
